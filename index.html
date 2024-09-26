@@ -12,6 +12,7 @@
     <script type="module" src="/main.js" defer></script>
 </head>
 <body>
+    <button id="previous-button">prev</button>
     <button id="play-button">play</button>
     <button id="stop-button">stop</button>
     <button id="next-button">next</button>
@@ -20,5 +21,23 @@
     <!-- <video id="the-video"></video> -->
     <p id="status">*</p>
     <input type="range" name="volume" id="volume" >
+
+    <hr>
+    <br>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <!-- <label for="fileInput">Select files/folders</label> -->
+        <!-- <input type="file" name="files[]" id="fileInput" multiple webkitdirectory> -->
+        <div>
+            <label for="fileInput">Select files</label>
+            <input type="file" name="files[]" id="fileInput" multiple>
+        </div>
+        
+        <div>
+            <label for="folderInput">Select folder</label>
+            <input type="file" name="folder[]" id="folderInput" multiple webkitdirectory>
+        </div>
+        
+        <button type="submit">Upload</button>
+    </form>
 </body>
 </html>

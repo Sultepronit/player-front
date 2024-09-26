@@ -1,17 +1,57 @@
 import fetchBlob from './fetchBlob';
 import playBlob from './playBlob';
+import { getFile, saveFile } from './localDbHandlers';
 import './style.css';
+
+console.time('t');
+
+const urls = [
+    '01%20-%20Misaki%20Meguri.mp3',
+    '11%20-%20Kaeru%20kara%20%28Guitar%20Version%29.mp3'
+];
+
+let currentId = 0;
+async function setNextSrc() {
+    const blob = await getFile(currentId);
+    audio.src = URL.createObjectURL(blob);
+    // playBlob(blob);
+    console.log(blob);
+    console.log(audio);
+
+    currentId++;
+    if(currentId >= urls.length) currentId = 0;
+}
+
+const dbIsPopulated = localStorage.getItem('dbIsPopulated');
+if(dbIsPopulated) {
+    console.log('setNextSrc');
+    setNextSrc();
+} else {
+    console.log('populate');
+    for(let i = 0; i < urls.length; i++) {
+        // const blob = await fetchBlob(urls[i]);
+        // await saveFile(i, blob);
+        fetchBlob(urls[i]).then(blob => {
+            saveFile(i, blob);
+        })
+    }
+    localStorage.setItem('dbIsPopulated', true);
+    // location.reload();
+    console.log('reload?...')
+}
+
+
 
 // const audio = new Audio();
 const audio = document.getElementById('the-audio');
 // const audio = document.getElementById('the-video');
 
-const blob = await fetchBlob('01%20-%20Misaki%20Meguri.mp3');
-const audioUrl = playBlob(blob);
+// const blob = await fetchBlob('01%20-%20Misaki%20Meguri.mp3');
+// const audioUrl = playBlob(blob);
 
-audio.src = audioUrl;
+// audio.src = audioUrl;
 
-const audio2 = new Audio();
+// const audio2 = new Audio();
 // audio2.src = '11%20-%20Kaeru%20kara%20%28Guitar%20Version%29.mp3';
 
 let volume = 70;
@@ -59,7 +99,8 @@ function play() {
 
 async function playNext() {
     await pause();
-    audio.src = '11%20-%20Kaeru%20kara%20%28Guitar%20Version%29.mp3';
+    // audio.src = '11%20-%20Kaeru%20kara%20%28Guitar%20Version%29.mp3';
+    await setNextSrc();
     play();
 }
 
@@ -85,7 +126,7 @@ audio.addEventListener('timeupdate', () => {
     if (navigator.mediaSession.setPositionState) {
         // console.log(audio.currentTime);
         navigator.mediaSession.setPositionState({
-            duration: audio.duration,
+            duration: audio.duration || 0,
             playbackRate: audio.playbackRate,
             position: audio.currentTime
         });
