@@ -2,6 +2,7 @@ import fetchBlob from './fetchBlob';
 import playBlob from './playBlob';
 import { getFile, saveFile } from './localDbHandlers';
 import './style.css';
+import { uploadFiles } from './uploadHandlers';
 
 console.time('t');
 
@@ -121,17 +122,19 @@ volumeControl.addEventListener('input', (e) => {
 
 const statusElement = document.getElementById('status');
 
-audio.addEventListener('timeupdate', () => {
-    // console.log(audio.currentTime);
-    if (navigator.mediaSession.setPositionState) {
-        // console.log(audio.currentTime);
-        navigator.mediaSession.setPositionState({
-            duration: audio.duration || 0,
-            playbackRate: audio.playbackRate,
-            position: audio.currentTime
-        });
-    }
-});
+document.getElementById('uploadForm').addEventListener('submit', uploadFiles);
+
+// audio.addEventListener('timeupdate', () => {
+//     // console.log(audio.currentTime);
+//     if (navigator.mediaSession.setPositionState) {
+//         // console.log(audio.currentTime);
+//         navigator.mediaSession.setPositionState({
+//             duration: audio.duration || 0,
+//             playbackRate: audio.playbackRate,
+//             position: audio.currentTime
+//         });
+//     }
+// });
 
 if ('mediaSession' in navigator) {
     // Set the metadata (title, artist, etc.) for the notification
