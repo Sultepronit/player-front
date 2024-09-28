@@ -12,7 +12,7 @@ export async function uploadFiles(e) {
         formData.append('file', file);
         // console.log(formData);
         try {
-            const response = await fetch('https://dthjysrf.duckdns.org/player/upload', {
+            const response = await fetch('http://localhost:5500/player/upload', {
                 method: 'POST',
                 body: formData
             });

@@ -1,4 +1,4 @@
-import { setPause } from "./helpers";
+// import { setPause } from "./helpers";
 
 let db = null;
 
