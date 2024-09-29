@@ -32,8 +32,8 @@ function openLocalDb() {
 openLocalDb();
 
 export async function getStoredItem(storeName, id, valueName) {
-    console.log(`trying to get ${storeName}`);
-    console.log(id, valueName);
+    // console.log(`trying to get ${storeName}`);
+    // console.log(id, valueName);
 
     if(!db) {
         await setPause(100);

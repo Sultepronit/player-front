@@ -14,7 +14,7 @@ export async function uploadFiles(e) {
         formData.append('file', file);
         // console.log(formData);
         try {
-            const response = await fetch('http://localhost:5500/player/upload', {
+            const response = await fetch(`${apiUrl}/upload`, {
                 method: 'POST',
                 body: formData
             });
