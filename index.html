@@ -16,12 +16,19 @@
     <button id="play-button">play</button>
     <!-- <button id="stop-button">stop</button> -->
     <button id="next-button">next</button>
-    <audio id="the-audio" controls></audio>
+    <div>
+      <span id="time">0:00 / 0:00</span>
+      <input type="range" name="progressBar" id="progressBar" min="0" max="100" value="0">
+    </div>
+    <!-- <audio id="the-audio" controls></audio> -->
     <!-- <video id="the-video" controls></video> -->
     <!-- <video id="the-video"></video> -->
     <p id="filename">filename</p>
     <p id="status">status</p>
-    <input type="range" name="volume" id="volume" >
+    <div>
+      🔊
+      <input type="range" name="volume" id="volume" min="0" max="100" value="70">
+    </div>
 
     <hr>
     <br>
@@ -38,7 +45,7 @@
             <input type="file" name="folder" id="folderInput" multiple webkitdirectory>
         </div>
         
-        <button type="submit">Upload</button>
+        <button type="submit">upload</button>
     </form>
 </body>
 </html>

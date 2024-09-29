@@ -1,14 +1,11 @@
-import fetchBlob from "./services/fetchBlob";
-import { getStoredItem, storeItem } from "./services/localDbHandlers";
-import updateFilenames from "./services/updateFilenames";
-
-const audio = document.getElementById('the-audio');
-const filenameDisplay = document.getElementById('filename');
-const statusDisplay = document.getElementById('status');
+import { audio, filenameDisplay, statusDisplay } from '../main';
+import fetchBlob from "./fetchBlob";
+import { getStoredItem, storeItem } from "./localDbHandlers";
+import updateFilenames from "./updateFilenames";
 
 let filenames = [];
 
-export default async function startSession() {
+export async function startSession() {
     filenames = await getStoredItem('filenames', 'filenames', 'data');
     console.log(filenames);
     console.timeLog('t', 'Restored filenames(?)');
@@ -69,7 +66,3 @@ export async function chosePrevisous(play = false) {
 
     if (play) audio.play();
 }
-
-audio.onended = () => choseNext(true);
-
-export { audio };
