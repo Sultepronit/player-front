@@ -37,20 +37,20 @@ const VitePWAOptions = {
         "theme_color": "#01AE07",
         "description": "My web based music player"
     },
-    workbox: {
-        runtimeCaching: [
-            {
-                urlPattern: ({ request }) => request.destination === 'audio',
-                handler: 'CacheFirst',
-                options: {
-                    cacheName: 'music-cache',
-                    expiration: {
-                        maxAgeSeconds: 60 * 60 * 24 * 365
-                    }
-                }
-            }
-        ]
-    }
+    // workbox: {
+    //     runtimeCaching: [
+    //         {
+    //             urlPattern: ({ request }) => request.destination === 'audio',
+    //             handler: 'CacheFirst',
+    //             options: {
+    //                 cacheName: 'music-cache',
+    //                 expiration: {
+    //                     maxAgeSeconds: 60 * 60 * 24 * 365
+    //                 }
+    //             }
+    //         }
+    //     ]
+    // }
 }
 
 export default VitePWAOptions;

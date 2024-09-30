@@ -1,6 +1,6 @@
 import './style.css';
 import { uploadFiles } from './services/uploadHandlers';
-import { startSession, chosePrevisous, choseNext } from './services/playbackHandlers';
+import { startSession, chosePrevisous, choseNext } from './src/playbackHandlers';
 import formateSeconds from './helpers/formateSeconds';
 
 console.time('t');

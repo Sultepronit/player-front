@@ -4,15 +4,16 @@ let db = null;
 
 function openLocalDb() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('audioDb', 3);
+        const request = indexedDB.open('audioDb', 4);
 
         request.onupgradeneeded = () => {
             console.log('upgrading indexedDB!');
             const upgradingDb = request.result;
-            upgradingDb.createObjectStore('filenames', { keyPath: 'id' });
-            if (upgradingDb.objectStoreNames.contains('files')) {
-                upgradingDb.deleteObjectStore('files');
-            }
+            // upgradingDb.createObjectStore('filenames', { keyPath: 'id' });
+            upgradingDb.createObjectStore('details', { keyPath: 'id' });
+            // if (upgradingDb.objectStoreNames.contains('files')) {
+            //     upgradingDb.deleteObjectStore('files');
+            // }
             upgradingDb.createObjectStore('files', { keyPath: 'filename' });
         };
 
