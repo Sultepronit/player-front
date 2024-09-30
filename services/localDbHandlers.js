@@ -14,7 +14,10 @@ function openLocalDb() {
             // if (upgradingDb.objectStoreNames.contains('files')) {
             //     upgradingDb.deleteObjectStore('files');
             // }
-            upgradingDb.createObjectStore('files', { keyPath: 'filename' });
+            // upgradingDb.createObjectStore('files', { keyPath: 'filename' });
+            if (!upgradingDb.objectStoreNames.contains('files')) {
+                upgradingDb.createObjectStore('files', { keyPath: 'filename' });
+            }
         };
 
         request.onerror = () => {

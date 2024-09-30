@@ -7,7 +7,6 @@ console.time('t');
 
 const audio = new Audio();
 
-// const audio = document.getElementById('the-audio');
 const timeDisplay = document.getElementById('time');
 const progressBar = document.getElementById('progressBar');
 const filenameDisplay = document.getElementById('filename');
@@ -25,7 +24,7 @@ audio.addEventListener('timeupdate', () => {
 
     const currentTime = formateSeconds(audio.currentTime);
     const duration = formateSeconds(improvedDuration);
-    timeDisplay.innerText = `${currentTime} / ${duration}`
+    timeDisplay.innerText = `${currentTime} / ${duration}`;
 });
 
 progressBar.addEventListener('input', () => {
@@ -72,8 +71,8 @@ document.getElementById('uploadForm').addEventListener('submit', uploadFiles);
 if ('mediaSession' in navigator) {
     navigator.mediaSession.setActionHandler('play', () => audio.play());
     navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevisous(true));
-    navigator.mediaSession.setActionHandler('nexttrack', () => choseNext(true));
+    navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevisous());
+    navigator.mediaSession.setActionHandler('nexttrack', () => choseNext());
 }
 
 export { audio, filenameDisplay, statusDisplay };
