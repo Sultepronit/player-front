@@ -19,7 +19,7 @@ setInterval(() => saveTime(), 30 * 1000);
 export async function startSession() {
     playlist = await getStoredItem('details', 'details', 'data');
     console.log(playlist);
-    updatePlaylistView(playlist);
+    updatePlaylistView(playlist || []);
     console.timeLog('t', 'Restored playlist(?)');
 
     if (!playlist) {
@@ -114,7 +114,7 @@ function setMedia({ mediaInfo, mediaFile }, play = true) {
     if (play) audio.play();
 
     filenameDisplay.innerText = `${id}: ${originalFilename}`;
-    setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 100);
+    setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 300);
 
     console.log(history);
     localStorage.setItem('history', JSON.stringify(history));
