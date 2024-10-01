@@ -27,9 +27,6 @@ export async function startSession() {
         storeItem('details', { id: 'details', data: playlist });
     } else {
         fetchWithFeatures('/list').then(newPlaylist => {
-            // if (newPlaylist.length !== playlist?.length) {
-            //     storeItem('details', { id: 'details', data: newPlaylist });
-            // } 
             console.log(newPlaylist);
 
             if (newPlaylist.length > playlist.length) {
@@ -44,7 +41,8 @@ export async function startSession() {
         })
     }
 
-    const savedHistory = localStorage.getItem('history');
+    // const savedHistory = localStorage.getItem('history');
+    const savedHistory = null;
     if (savedHistory) {
         document.getElementById('status').innerText = (savedHistory);
         history = JSON.parse(savedHistory);
