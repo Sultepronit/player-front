@@ -2,6 +2,7 @@ import './style.css';
 import { uploadFiles } from './services/uploadHandlers';
 import { startSession, chosePrevisous, choseNext } from './src/playbackHandlers';
 import formateSeconds from './helpers/formateSeconds';
+import { saveTime } from './services/timeSaver';
 
 console.time('t');
 
@@ -20,15 +21,14 @@ audio.onended = () => choseNext(true);
 audio.addEventListener('timeupdate', () => {
     const improvedDuration = audio.duration || 0; // can be NaN
 
-    progressBar.value = (audio.currentTime / improvedDuration) * 100;
+    progressBar.value = (audio.currentTime / improvedDuration) * 1000;
 
     const currentTime = formateSeconds(audio.currentTime);
-    const duration = formateSeconds(improvedDuration);
-    timeDisplay.innerText = `${currentTime} / ${duration}`;
+    timeDisplay.innerText = `${currentTime}`;
 });
 
 progressBar.addEventListener('input', () => {
-    audio.currentTime = progressBar.value / 100 * audio.duration;
+    audio.currentTime = progressBar.value / 1000 * audio.duration;
 });
 
 let isPlaying = false;
@@ -40,12 +40,14 @@ playButton.addEventListener('click', () => {
 
 audio.addEventListener('play', () => {
     isPlaying = true;
-    playButton.innerText = 'stop';
+    playButton.innerText = '⏸️';
+    saveTime();
 });
 
 audio.addEventListener('pause', () => {
     isPlaying = false;
-    playButton.innerText = 'play';
+    playButton.innerText = '▶️';
+    saveTime();
 });
 
 document.getElementById('prev-button')

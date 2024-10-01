@@ -1,3 +1,55 @@
-button {
-    font-size: 3rem;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+body {
+    margin: 0.5rem;
+    display: grid;
+    height: 90vh;
+}
+
+.playlist-view {
+    overflow: auto;
+    margin-block: 0.5rem;
+}
+
+#playlist li {
+    background-color: aqua;
+    margin: 4px;
+    border-radius: 3px;
+    padding-inline: 0.2em;
+}
+
+.volume {
+    float: right;
+}
+
+.nav-buttons {
+    clear: both;
+    display: flex;
+    font-size: 3rem;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#time {
+    float: left;
+}
+
+#duration {
+    float: right;
+}
+
+.progress {
+    margin-bottom : 1rem;
+}
+
+#progressBar {
+    width: 100%;
+}
+
+/* button {
+    font-size: 3rem;
+} */

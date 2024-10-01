@@ -1,32 +1,60 @@
+import formateSeconds from '../helpers/formateSeconds';
 import setPause from '../helpers/setPause';
 import { audio, filenameDisplay, statusDisplay } from '../main';
 import { fetchBlob, fetchWithFeatures } from '../services/api';
 import { getStoredItem, storeItem } from "../services/localDbHandlers";
+import { restoreTime, saveTime } from '../services/timeSaver';
+import { updatePlaylistView } from './playlistDisplay';
+import { durationDisplay } from './uiControls';
 
 let playlist = [];
-const pastList = [];
-let futureList = [];
+let history = {
+    past: [],
+    future: [],
+    inPast: 0,
+}
+
+setInterval(() => saveTime(), 30 * 1000);
 
 export async function startSession() {
     playlist = await getStoredItem('details', 'details', 'data');
     console.log(playlist);
+    updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist(?)');
 
-    if(!playlist) {
+    if (!playlist) {
         playlist = await fetchWithFeatures('/list');
         storeItem('details', { id: 'details', data: playlist });
     } else {
         fetchWithFeatures('/list').then(newPlaylist => {
-            if (newPlaylist.length !== playlist?.length) {
-                storeItem('details', { id: 'details', data: newPlaylist });
-            } 
+            // if (newPlaylist.length !== playlist?.length) {
+            //     storeItem('details', { id: 'details', data: newPlaylist });
+            // } 
+            console.log(newPlaylist);
+
+            if (newPlaylist.length > playlist.length) {
+                const newMediaIndexes = [...newPlaylist.keys()].slice(playlist.length);
+                console.log(newMediaIndexes);
+                history.future.push(...newMediaIndexes);
+            }
+
+            playlist = newPlaylist;
+            updatePlaylistView(playlist);
+            storeItem('details', { id: 'details', data: newPlaylist });
         })
     }
 
-    futureList.push(...playlist.keys());
-    console.log(futureList);
+    const savedHistory = localStorage.getItem('history');
+    if (savedHistory) {
+        history = JSON.parse(savedHistory);
+        history.inPast++;
+        chosePrevisous(false);
+        restoreTime();
+    } else {
+        history.future.push(...playlist.keys());
+        choseNext(false);
+    }
 
-    choseNext(false);
     console.timeLog('t', 'Starting playback...');
 }
 
@@ -52,7 +80,7 @@ async function getRemoteFile(filename) {
 async function tryAndFindAvailable() {
     let freshLoadedFile = null;
 
-    const mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
+    const mediaIndex = history.future[Math.floor(Math.random() * history.future.length)];
     const mediaInfo = playlist[mediaIndex];
 
     const mediaFile = await getLocalFile(mediaInfo.filename);
@@ -62,8 +90,8 @@ async function tryAndFindAvailable() {
     getRemoteFile(mediaInfo.filename).then(file => freshLoadedFile = file);
 
     // trying to find available file through all the list
-    console.log('searching for awailable file');
-    for (const mediaIndex of futureList) {
+    console.log('searching for available file');
+    for (const mediaIndex of history.future) {
         const mediaInfo = playlist[mediaIndex];
 
         const mediaFile = await getLocalFile(mediaInfo.filename);
@@ -71,7 +99,7 @@ async function tryAndFindAvailable() {
     }
 
     // if nothing found, the only way is to wait for our first file, to be available
-    console.log('waiting for the file to be awailable');
+    console.log('waiting for the file to be available');
     while(!freshLoadedFile) {
         await setPause(300);
     }
@@ -81,27 +109,29 @@ async function tryAndFindAvailable() {
 
 function setMedia({ mediaInfo, mediaFile }, play = true) {
     const { id, originalFilename } = mediaInfo;
-    filenameDisplay.innerText = `${id}: ${originalFilename}`;
 
     audio.src = URL.createObjectURL(mediaFile);
     if (play) audio.play();
+
+    filenameDisplay.innerText = `${id}: ${originalFilename}`;
+    setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 100);
+
+    console.log(history);
+    localStorage.setItem('history', JSON.stringify(history));
 }
 
-let inPast = 0;
 let prepared = null;
 export async function choseNext(play = true) {    
-    if (inPast < 0) return playAgainNext();
+    if (history.inPast < 0) return playAgainNext();
 
     const media = prepared ? prepared : await tryAndFindAvailable();
     console.log(media);
 
-    futureList = futureList.filter(index => index !== media.mediaIndex);
-    pastList.push(media.mediaIndex);
-    if (pastList.length > futureList.length) {
-        futureList.push(pastList.shift());
+    history.future = history.future.filter(index => index !== media.mediaIndex);
+    history.past.push(media.mediaIndex);
+    if (history.past.length > history.future.length) {
+        history.future.push(history.past.shift());
     }
-    console.log(futureList);
-    console.log(pastList);
 
     setMedia(media, play);
 
@@ -110,20 +140,20 @@ export async function choseNext(play = true) {
     console.log('prepared next media');
 }
 
-export async function chosePrevisous() {
-    if (pastList.length + inPast < 2) return;
+export async function chosePrevisous(play = true) {
+    if (history.past.length + history.inPast < 2) return;
 
     const mediaInfo = playlist[
-        pastList[--inPast + pastList.length - 1]
+        history.past[--history.inPast + history.past.length - 1]
     ];
     const mediaFile = await getLocalFile(mediaInfo.filename);
 
-    setMedia({ mediaInfo, mediaFile });
+    setMedia({ mediaInfo, mediaFile }, play);
 }
 
 async function playAgainNext() {
     const mediaInfo = playlist[
-        pastList[++inPast + pastList.length - 1]
+        history.past[++history.inPast + history.past.length - 1]
     ];
     const mediaFile = await getLocalFile(mediaInfo.filename);
 
