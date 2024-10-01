@@ -44,7 +44,7 @@ export async function startSession() {
     const savedHistory = localStorage.getItem('history');
     // const savedHistory = null;
     if (savedHistory) {
-        document.getElementById('status').innerText = (savedHistory);
+        // document.getElementById('status').innerText = savedHistory;
         history = JSON.parse(savedHistory);
         history.inPast++;
         chosePrevious(false);
