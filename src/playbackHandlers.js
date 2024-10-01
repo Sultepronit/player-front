@@ -39,7 +39,7 @@ export async function startSession() {
             }
 
             playlist = newPlaylist;
-            updatePlaylistView(playlist);
+            updatePlaylistView(newPlaylist);
             storeItem('details', { id: 'details', data: newPlaylist });
         })
     }
@@ -48,7 +48,7 @@ export async function startSession() {
     if (savedHistory) {
         history = JSON.parse(savedHistory);
         history.inPast++;
-        chosePrevisous(false);
+        chosePrevious(false);
         restoreTime();
     } else {
         history.future.push(...playlist.keys());
@@ -140,7 +140,7 @@ export async function choseNext(play = true) {
     console.log('prepared next media');
 }
 
-export async function chosePrevisous(play = true) {
+export async function chosePrevious(play = true) {
     if (history.past.length + history.inPast < 2) return;
 
     const mediaInfo = playlist[

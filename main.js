@@ -1,6 +1,6 @@
 import './style.css';
 import { uploadFiles } from './services/uploadHandlers';
-import { startSession, chosePrevisous, choseNext } from './src/playbackHandlers';
+import { startSession, chosePrevious, choseNext } from './src/playbackHandlers';
 import formateSeconds from './helpers/formateSeconds';
 import { saveTime } from './services/timeSaver';
 
@@ -51,7 +51,7 @@ audio.addEventListener('pause', () => {
 });
 
 document.getElementById('prev-button')
-    .addEventListener('click', async () => chosePrevisous(true));
+    .addEventListener('click', async () => chosePrevious(true));
 
 document.getElementById('next-button')
     .addEventListener('click', async () => choseNext(true));
@@ -73,7 +73,7 @@ document.getElementById('uploadForm').addEventListener('submit', uploadFiles);
 if ('mediaSession' in navigator) {
     navigator.mediaSession.setActionHandler('play', () => audio.play());
     navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevisous());
+    navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());
     navigator.mediaSession.setActionHandler('nexttrack', () => choseNext());
 }
 
