@@ -12,19 +12,25 @@
     <script type="module" src="/main.js" defer></script>
 </head>
 <body>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <div>
-            <label for="fileInput">Select files</label>
-            <input type="file" name="files" id="fileInput" multiple>
-        </div>
-        
-        <div>
-            <label for="folderInput">Select folder</label>
-            <input type="file" name="folder" id="folderInput" multiple webkitdirectory>
-        </div>
-        
-        <button type="submit">upload</button>
-    </form>
+    <section class="file-upload">
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div>
+                <label for="fileInput">Select files</label>
+                <input type="file" name="files" id="fileInput" multiple>
+            </div>
+            
+            <div>
+                <label for="folderInput">Select folder</label>
+                <input type="file" name="folder" id="folderInput" multiple webkitdirectory>
+            </div>
+
+            <ul id="upload-list">
+                
+            </ul>
+            
+            <button type="submit">upload</button>
+        </form>
+    </section>
 
     <section class="playlist-view">
         <ul id="playlist">

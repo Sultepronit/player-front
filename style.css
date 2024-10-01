@@ -16,8 +16,8 @@ body {
 }
 
 #playlist li {
-    background-color: aqua;
-    margin: 4px;
+    background-color: #93ffcc;
+    margin-block: 4px;
     border-radius: 3px;
     padding-inline: 0.2em;
 }
