@@ -19,7 +19,7 @@ setInterval(() => saveTime(), 30 * 1000);
 export async function startSession() {
     playlist = await getStoredItem('details', 'details', 'data');
     console.log(playlist);
-    updatePlaylistView(playlist || []);
+    updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist(?)');
 
     if (!playlist) {
@@ -41,8 +41,8 @@ export async function startSession() {
         })
     }
 
-    // const savedHistory = localStorage.getItem('history');
-    const savedHistory = null;
+    const savedHistory = localStorage.getItem('history');
+    // const savedHistory = null;
     if (savedHistory) {
         document.getElementById('status').innerText = (savedHistory);
         history = JSON.parse(savedHistory);
