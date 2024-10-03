@@ -16,42 +16,58 @@ let history = {
 
 setInterval(() => saveTime(), 30 * 1000);
 
+function startFromScratch() {
+    history.future.push(...playlist.keys());
+    localStorage.setItem('history', JSON.stringify(history));
+    choseNext(false);
+}
+
+async function updatePlayList() {
+    const newPlaylist = await fetchWithFeatures('/list');
+    console.log('updated playlist:', newPlaylist);
+
+    if (newPlaylist.length > playlist.length) {
+        // const newMediaIndexes = [...newPlaylist.keys()].slice(playlist.length);
+        // console.log('new indexes:', newMediaIndexes);
+        // history.future.push(...newMediaIndexes);
+        history.future = [...newPlaylist.keys()]
+            .filter((index) => !history.past.includes(index));
+        console.log(history);
+        localStorage.setItem('history', JSON.stringify(history));
+    }
+
+    playlist = newPlaylist;
+    updatePlaylistView(newPlaylist);
+    storeItem('details', { id: 'details', data: newPlaylist });
+}
+
 export async function startSession() {
     playlist = await getStoredItem('details', 'details', 'data');
     console.log(playlist);
     updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist(?)');
 
-    if (!playlist) {
+    if (playlist) {
+        const restoredHistory = JSON.parse(localStorage.getItem('history'));
+        console.log(restoredHistory);
+        // const savedHistory = null;
+        if (restoredHistory?.past.length) {
+            // document.getElementById('status').innerText = savedHistory;
+            history = restoredHistory;
+            history.inPast++;
+            chosePrevious(false);
+            restoreTime();
+        } else {
+            startFromScratch();
+        }
+
+        updatePlayList();
+    } else {
         playlist = await fetchWithFeatures('/list');
+
+        startFromScratch();
+
         storeItem('details', { id: 'details', data: playlist });
-    } else {
-        fetchWithFeatures('/list').then(newPlaylist => {
-            console.log(newPlaylist);
-
-            if (newPlaylist.length > playlist.length) {
-                const newMediaIndexes = [...newPlaylist.keys()].slice(playlist.length);
-                console.log(newMediaIndexes);
-                history.future.push(...newMediaIndexes);
-            }
-
-            playlist = newPlaylist;
-            updatePlaylistView(newPlaylist);
-            storeItem('details', { id: 'details', data: newPlaylist });
-        })
-    }
-
-    const savedHistory = localStorage.getItem('history');
-    // const savedHistory = null;
-    if (savedHistory) {
-        // document.getElementById('status').innerText = savedHistory;
-        history = JSON.parse(savedHistory);
-        history.inPast++;
-        chosePrevious(false);
-        restoreTime();
-    } else {
-        history.future.push(...playlist.keys());
-        choseNext(false);
     }
 
     console.timeLog('t', 'Starting playback...');

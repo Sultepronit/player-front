@@ -12,53 +12,58 @@
     <script type="module" src="/main.js" defer></script>
 </head>
 <body>
-    <section class="file-upload">
-        <form id="uploadForm" enctype="multipart/form-data">
-            <div>
-                <label for="fileInput">Select files</label>
-                <input type="file" name="files" id="fileInput" multiple>
-            </div>
-            
-            <div>
-                <label for="folderInput">Select folder</label>
-                <input type="file" name="folder" id="folderInput" multiple webkitdirectory>
-            </div>
-
-            <ul id="upload-list">
+    <header>
+        <p id="status"></p>
+    </header>
+    <main>
+        <section class="file-upload">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div>
+                    <label for="fileInput">Select files</label>
+                    <input type="file" name="files" id="fileInput" multiple>
+                </div>
                 
+                <div>
+                    <label for="folderInput">Select folder</label>
+                    <input type="file" name="folder" id="folderInput" multiple webkitdirectory>
+                </div>
+    
+                <ul id="upload-list">
+                    
+                </ul>
+                
+                <button type="submit">upload</button>
+            </form>
+        </section>
+    
+        <section class="playlist-view">
+            <ul id="playlist">
+    
             </ul>
+        </section>
+    
+        <section class="player">    
+            <div class="volume">
+                <label for="volume">🔊</label>
+                <input type="range" name="volume" id="volume" min="0" max="100" value="70">
+            </div>
+    
+            <p id="filename">filename</p>
+
+            <div class="nav-buttons">
+                <p id="prev-button">⏮️</p>
+                <p id="play-button">▶️</p>
+                <p id="next-button">⏭️</p>
+            </div>
+    
+            <div class="progress">
+            <p id="time">0:00</p>
+            <p id="duration">0:00</p>
+            <input type="range" name="progressBar" id="progressBar" min="0" max="1000" value="0">
+            </div>
             
-            <button type="submit">upload</button>
-        </form>
-    </section>
-
-    <section class="playlist-view">
-        <ul id="playlist">
-
-        </ul>
-    </section>
-
-    <section class="player">
-        <p id="filename">filename</p>
-
-        <div class="volume">
-            <input type="range" name="volume" id="volume" min="0" max="100" value="70">
-            🔊
-        </div>
-
-        <div class="nav-buttons">
-            <p id="prev-button">⏮️</p>
-            <p id="play-button">▶️</p>
-            <p id="next-button">⏭️</p>
-        </div>
-
-        <div class="progress">
-        <p id="time">0:00</p>
-        <p id="duration">0:00</p>
-        <input type="range" name="progressBar" id="progressBar" min="0" max="1000" value="0">
-        </div>
-        
-        <!-- <p id="status">*</p> -->
-    </section>    
+            <!-- <p id="status">*</p> -->
+        </section>  
+    </main>  
 </body>
 </html>

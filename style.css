@@ -4,10 +4,28 @@
     box-sizing: border-box;
 }
 
-body {
+main {
     margin: 0.5rem;
     display: grid;
-    height: 90vh;
+    /* height: 90vh; */
+}
+
+#status {
+    width: 100%;
+    height: 3px;
+    /* background-color: green; */
+}
+
+.loading {
+    background-color: yellow;
+}
+
+.failed {
+    background-color: red;
+}
+
+.idle {
+    background-color: white;
 }
 
 .playlist-view {
@@ -23,7 +41,7 @@ body {
 }
 
 .volume {
-    float: right;
+    /* float: right; */
 }
 
 .nav-buttons {
