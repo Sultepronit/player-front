@@ -1,3 +1,5 @@
+import { addMessage } from "../src/handleMessages";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function retry(callback, ...args) {
@@ -16,6 +18,9 @@ export async function fetchWithFeatures(path, method = 'GET', parser = 'json', b
 
     try {
         const response = await fetch(apiUrl + path, { method, body });
+        if (!response.ok) throw new Error(`${response.status} (${response.statusText})`);
+        console.log(response);
+        console.log(`${response.status} (${response.statusText})`);
         const result = await response[parser]();
         statusBar.className = 'idle';
 
@@ -27,6 +32,7 @@ export async function fetchWithFeatures(path, method = 'GET', parser = 'json', b
             return await retry(fetchWithFeatures, path, method, parser, body);
         } else {
             console.error(error);
+            addMessage(error.message);
         }
     }
 }
@@ -36,6 +42,6 @@ export async function fetchPlaylist() {
 }
 
 export async function fetchBlob(filename) {
-    filename = filename.replace('.', '_'); // for dev !!!
+    // filename = filename.replace('.', '_'); // for dev !!!
     return await fetchWithFeatures(`/files/${filename}`, 'GET', 'blob');
 }

@@ -16,6 +16,36 @@ main {
     /* background-color: green; */
 }
 
+#messages {
+    position: fixed;
+    width: 98%;
+    margin: 1%;
+    /* background-color: #ffffffdb; */
+    background-color: #f5b3b3db;
+    padding: 0.2em;
+}
+
+#messages p {
+    margin-block: 4px;
+    /* border: 1px solid; */
+    /* background-color: #f5b3b3db; */
+    background-color: #ffffffdb;
+    border-radius: 3px;
+    padding-inline: 0.4em;
+    /* color: red; */
+}
+
+#hide-messages {
+    /* float: right; */
+    padding-inline: 1em;
+    display: block;
+    margin: auto;
+}
+
+.hidden {
+    display: none;
+}
+
 .loading {
     background-color: yellow;
 }

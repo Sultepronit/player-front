@@ -4,6 +4,7 @@ import { audio, filenameDisplay, statusDisplay } from '../main';
 import { fetchBlob, fetchWithFeatures } from '../services/api';
 import { getStoredItem, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
+import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
 import { durationDisplay } from './uiControls';
 
@@ -86,11 +87,7 @@ async function getRemoteFile(filename) {
     console.log('filename:', filename);
     const audioBlob = await fetchBlob(filename);
     console.log('fetched:', audioBlob);
-    if (audioBlob) {
-        storeItem('files', { filename, blob: audioBlob });
-    } else {
-        statusDisplay.innerText = 'Load failed!';
-    }
+    storeItem('files', { filename, blob: audioBlob });
     return audioBlob;
 }
 
@@ -124,18 +121,30 @@ async function tryAndFindAvailable() {
     return { mediaIndex, mediaInfo, mediaFile: freshLoadedFile };
 }
 
-function setMedia({ mediaInfo, mediaFile }, play = true) {
+async function setMedia({ mediaInfo, mediaFile }, play = true) {
     const { id, originalFilename } = mediaInfo;
 
-    audio.src = URL.createObjectURL(mediaFile);
-    if (play) audio.play();
+    try {
+        if (mediaFile?.type.includes('text')) throw new Error('Wrong file type!');
+        audio.src = URL.createObjectURL(mediaFile);   
 
-    filenameDisplay.innerText = `${id}: ${originalFilename}`;
-    setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 300);
+        if (play) await audio.play();
 
-    console.log(history);
-    // document.getElementById('msg').innerText = history.future;
-    localStorage.setItem('history', JSON.stringify(history));
+        setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 300);
+
+        console.log(history);
+        localStorage.setItem('history', JSON.stringify(history));
+    } catch (error) { // no file is stored, or not a mediafile
+        // console.log(mediaFile?.type, 'instead of mediafile!');
+        addMessage(
+            `Get ${mediaFile?.type} instead of mediafile! <br>
+            Trying to fetch it on more time.`
+        );
+        getRemoteFile(mediaInfo.filename);
+        // choseNext();
+    } finally {
+        filenameDisplay.innerText = `${id}: ${originalFilename}`;
+    }
 }
 
 let prepared = null;
