@@ -58,7 +58,7 @@ export async function startSession() {
             chosePrevious(false);
             restoreTime();
 
-            document.getElementById('msg').innerText = history.future;
+            // document.getElementById('msg').innerText = history.future;
         } else {
             startFromScratch();
         }
@@ -134,7 +134,7 @@ function setMedia({ mediaInfo, mediaFile }, play = true) {
     setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 300);
 
     console.log(history);
-    document.getElementById('msg').innerText = history.future;
+    // document.getElementById('msg').innerText = history.future;
     localStorage.setItem('history', JSON.stringify(history));
 }
 
