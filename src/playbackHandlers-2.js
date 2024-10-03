@@ -83,29 +83,22 @@ async function getLocalFile(filename) {
     return audioBlob;
 }
 
-// there can be caotic request for differet or even one and the same file,
-// but we must fetch them one by one
-let isBusy = false;
-const queue = new Set();
-async function fetchAndStoreRemoteFile(filename) { // should I split it?..
-    queue.add(filename);
-    if (isBusy) return;
-    isBusy = true;
-
+async function getRemoteFile(filename) {
     console.log('filename:', filename);
     const audioBlob = await fetchBlob(filename);
 
-    console.log('fetched:', audioBlob);
-    await storeItem('files', { filename, blob: audioBlob });
+    if (audioBlob === 'busy now') return;
 
-    isBusy = false;
-    queue.delete(filename); 
-    if (queue.size) fetchAndStoreRemoteFile([...queue][0]); 
+    console.log('fetched:', audioBlob);
+    storeItem('files', { filename, blob: audioBlob });
+
+    return audioBlob;
 }
 
 let nothingToPlay = false; // disables choseNext
 async function tryAndFindAvailable() {
-    // trying to get random file
+    let freshLoadedFile = null;
+
     const mediaIndex = history.future[Math.floor(Math.random() * history.future.length)];
     const mediaInfo = playlist[mediaIndex];
 
@@ -113,28 +106,28 @@ async function tryAndFindAvailable() {
     if(mediaFile) return { mediaIndex, mediaInfo, mediaFile };
 
     // immediately fetching the unavailable file for more or less near future
-    fetchAndStoreRemoteFile(mediaInfo.filename);
+    getRemoteFile(mediaInfo.filename).then(file => freshLoadedFile = file);
 
     // trying to find available file through all the list
-    // repeating time after time if no success, waiting for the file to become available
     console.log('searching for available file');
-    for (let tries = 0; tries < 300; tries++) { // like 10 minutes of tries
-        for (const mediaIndex of history.future) {
-            const mediaInfo = playlist[mediaIndex];
-    
-            const mediaFile = await getLocalFile(mediaInfo.filename);
-            if (mediaFile) {
-                nothingToPlay = false;
-                return { mediaIndex, mediaInfo, mediaFile }; 
-            }
-        }
+    for (const mediaIndex of history.future) {
+        const mediaInfo = playlist[mediaIndex];
 
-        // now we cannot play next, we must wait
-        nothingToPlay = true;
-        addMessage('Waiting for the file to be available...');
-
-        await setPause(2000);
+        const mediaFile = await getLocalFile(mediaInfo.filename);
+        if(mediaFile) return { mediaIndex, mediaInfo, mediaFile };
     }
+
+    // if nothing found, the only way is to wait for our first file, to be available
+    nothingToPlay = true;
+
+    addMessage('Waiting for the file to be available...');
+    while(!freshLoadedFile) {
+        await setPause(300);
+    }
+
+    nothingToPlay = false;
+    
+    return { mediaIndex, mediaInfo, mediaFile: freshLoadedFile };
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
@@ -156,7 +149,7 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
             `Get ${mediaFile?.type} instead of mediafile! <br>
             Trying to fetch it one more time.`
         );
-        fetchAndStoreRemoteFile(mediaInfo.filename);
+        getRemoteFile(mediaInfo.filename);
         // choseNext();
     } finally {
         filenameDisplay.innerText = `${id}: ${originalFilename}`;

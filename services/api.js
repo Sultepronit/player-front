@@ -19,8 +19,7 @@ export async function fetchWithFeatures(path, method = 'GET', parser = 'json', b
     try {
         const response = await fetch(apiUrl + path, { method, body });
         if (!response.ok) throw new Error(`${response.status} (${response.statusText})`);
-        console.log(response);
-        console.log(`${response.status} (${response.statusText})`);
+        // console.log(response);
         const result = await response[parser]();
         statusBar.className = 'idle';
 
@@ -41,7 +40,11 @@ export async function fetchPlaylist() {
     return await fetchWithFeatures('/list');
 }
 
+const doChangeFilename = import.meta.env.VITE_CHANGE_FILENAME;
+
 export async function fetchBlob(filename) {
-    // filename = filename.replace('.', '_'); // for dev !!!
-    return await fetchWithFeatures(`/files/${filename}`, 'GET', 'blob');
+    if (doChangeFilename) {
+        filename = filename.replace('.', '_'); // for dev !!!
+    }
+    return fetchWithFeatures(`/files/${filename}`, 'GET', 'blob');
 }

@@ -7,5 +7,6 @@ export function addMessage(message) {
 }
 
 document.getElementById('hide-messages').addEventListener('click', () => {
+    msgBoard.innerHTML = '';
     messagesDisplay.classList.add('hidden');
 });
