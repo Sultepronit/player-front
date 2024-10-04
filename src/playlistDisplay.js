@@ -1,4 +1,5 @@
-import { listDisplay } from "./uiControls";
+// import { listDisplay } from "./uiControls";
+export const listDisplay = document.getElementById('playlist');
 
 export function updatePlaylistView(playlist) {
     if (!playlist) return;

@@ -2,7 +2,7 @@ import { audio } from "../main";
 
 export function saveTime() {
     localStorage.setItem('currentTime', audio.currentTime);
-    console.log('saved:', audio.currentTime);
+    // console.log('saved:', audio.currentTime);
 }
 
 export function restoreTime() {

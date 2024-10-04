@@ -1,12 +1,12 @@
 import formateSeconds from '../helpers/formateSeconds';
-import setPause from '../helpers/setPause';
-import { audio, filenameDisplay, statusDisplay } from '../main';
-import { fetchBlob, fetchWithFeatures } from '../services/api';
+import { audio, filenameDisplay } from '../main';
+import { fetchWithFeatures } from '../services/api';
+import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
 import { getStoredItem, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
-import { durationDisplay } from './uiControls';
+// import { durationDisplay } from './uiControls';
 
 let playlist = [];
 let history = {
@@ -28,9 +28,6 @@ async function updatePlayList() {
     console.log('updated playlist:', newPlaylist);
 
     if (newPlaylist.length > playlist.length) {
-        // const newMediaIndexes = [...newPlaylist.keys()].slice(playlist.length);
-        // console.log('new indexes:', newMediaIndexes);
-        // history.future.push(...newMediaIndexes);
         history.future = [...newPlaylist.keys()]
             .filter((index) => !history.past.includes(index));
         console.log(history);
@@ -53,13 +50,11 @@ export async function startSession() {
         console.log(restoredHistory);
         // const savedHistory = null;
         if (restoredHistory?.past.length) {
-            // document.getElementById('status').innerText = savedHistory;
             history = restoredHistory;
             history.inPast++;
+
             chosePrevious(false);
             restoreTime();
-
-            // document.getElementById('msg').innerText = history.future;
         } else {
             startFromScratch();
         }
@@ -76,68 +71,8 @@ export async function startSession() {
     console.timeLog('t', 'Starting playback...');
 }
 
-async function getLocalFile(filename) {
-    console.log('filename:', filename);
-    const audioBlob = await getStoredItem('files', filename, 'blob');
-    console.log('local:', audioBlob);
-    return audioBlob;
-}
-
-// there can be caotic request for differet or even one and the same file,
-// but we must fetch them one by one
-let isBusy = false;
-const queue = new Set();
-async function fetchAndStoreRemoteFile(filename) { // should I split it?..
-    queue.add(filename);
-    if (isBusy) return;
-    isBusy = true;
-
-    console.log('filename:', filename);
-    const audioBlob = await fetchBlob(filename);
-
-    console.log('fetched:', audioBlob);
-    await storeItem('files', { filename, blob: audioBlob });
-
-    isBusy = false;
-    queue.delete(filename); 
-    if (queue.size) fetchAndStoreRemoteFile([...queue][0]); 
-}
-
-let nothingToPlay = false; // disables choseNext
-async function tryAndFindAvailable() {
-    // trying to get random file
-    const mediaIndex = history.future[Math.floor(Math.random() * history.future.length)];
-    const mediaInfo = playlist[mediaIndex];
-
-    const mediaFile = await getLocalFile(mediaInfo.filename);
-    if(mediaFile) return { mediaIndex, mediaInfo, mediaFile };
-
-    // immediately fetching the unavailable file for more or less near future
-    fetchAndStoreRemoteFile(mediaInfo.filename);
-
-    // trying to find available file through all the list
-    // repeating time after time if no success, waiting for the file to become available
-    console.log('searching for available file');
-    for (let tries = 0; tries < 300; tries++) { // like 10 minutes of tries
-        for (const mediaIndex of history.future) {
-            const mediaInfo = playlist[mediaIndex];
-    
-            const mediaFile = await getLocalFile(mediaInfo.filename);
-            if (mediaFile) {
-                nothingToPlay = false;
-                return { mediaIndex, mediaInfo, mediaFile }; 
-            }
-        }
-
-        // now we cannot play next, we must wait
-        nothingToPlay = true;
-        addMessage('Waiting for the file to be available...');
-
-        await setPause(2000);
-    }
-}
-
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
+    console.log('setting:', mediaInfo, mediaFile );
     const { id, originalFilename } = mediaInfo;
 
     try {
@@ -146,42 +81,46 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
 
         if (play) await audio.play();
 
-        setTimeout(() => durationDisplay.innerText = formateSeconds(audio.duration), 300);
-
         console.log(history);
         localStorage.setItem('history', JSON.stringify(history));
     } catch (error) { // no file is stored, or not a mediafile
-        // console.log(mediaFile?.type, 'instead of mediafile!');
         addMessage(
             `Get ${mediaFile?.type} instead of mediafile! <br>
             Trying to fetch it one more time.`
         );
         fetchAndStoreRemoteFile(mediaInfo.filename);
-        // choseNext();
     } finally {
         filenameDisplay.innerText = `${id}: ${originalFilename}`;
     }
 }
 
-let prepared = null;
+let nextMedia = null;
+let isBusy = false;
 export async function choseNext(play = true) {
-    if (nothingToPlay) return;
     if (history.inPast < 0) return playAgainNext();
 
-    const media = prepared ? prepared : await tryAndFindAvailable();
-    console.log(media);
+    if (isBusy) {
+        addMessage('Please, wait a bit!');
+        return;
+    }
+    isBusy = true;
 
-    history.future = history.future.filter(index => index !== media.mediaIndex);
-    history.past.push(media.mediaIndex);
+    if (!nextMedia) nextMedia = await tryAndFindAvailable(playlist, history.future);
+    // console.log(nextMedia);
+
+    history.future = history.future.filter(index => index !== nextMedia.mediaIndex);
+    history.past.push(nextMedia.mediaIndex);
+
     if (history.past.length > history.future.length) {
         history.future.push(history.past.shift());
     }
 
-    setMedia(media, play);
+    setMedia(nextMedia, play);
 
-    prepared = null;
-    prepared = await tryAndFindAvailable();
-    console.log('prepared next media');
+    nextMedia = null;
+    isBusy = false;
+
+    nextMedia = await tryAndFindAvailable(playlist, history.future);
 }
 
 export async function chosePrevious(play = true) {
@@ -191,6 +130,7 @@ export async function chosePrevious(play = true) {
         history.past[--history.inPast + history.past.length - 1]
     ];
     const mediaFile = await getLocalFile(mediaInfo.filename);
+    console.log(mediaFile);
 
     setMedia({ mediaInfo, mediaFile }, play);
 }
