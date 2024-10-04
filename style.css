@@ -83,12 +83,16 @@ main {
 }
 
 #time {
-    float: left;
+    /* float: left; */
+    /* display: flex;
+    justify-self: center;
+    margin: auto; */
+    text-align: center;
 }
 
-#duration {
+/* #duration {
     float: right;
-}
+} */
 
 .progress {
     margin-bottom : 1rem;

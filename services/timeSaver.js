@@ -1,4 +1,4 @@
-import { audio } from "../main";
+import { audio } from "../src/playbackHandlers";
 
 export function saveTime() {
     localStorage.setItem('currentTime', audio.currentTime);

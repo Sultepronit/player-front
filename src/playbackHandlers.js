@@ -1,12 +1,14 @@
-import formateSeconds from '../helpers/formateSeconds';
-import { audio, filenameDisplay } from '../main';
 import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
 import { getStoredItem, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
+import displayMediaInfo from './displayMediaInfo';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
-// import { durationDisplay } from './uiControls';
+
+const audio = new Audio();
+
+audio.onended = () => choseNext(true);
 
 let playlist = [];
 let history = {
@@ -63,9 +65,11 @@ export async function startSession() {
     } else {
         playlist = await fetchWithFeatures('/list');
 
-        startFromScratch();
+        updatePlaylistView(playlist);
 
         storeItem('details', { id: 'details', data: playlist });
+
+        startFromScratch();
     }
 
     console.timeLog('t', 'Starting playback...');
@@ -73,7 +77,8 @@ export async function startSession() {
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
     console.log('setting:', mediaInfo, mediaFile );
-    const { id, originalFilename } = mediaInfo;
+    // const { id, originalFilename } = mediaInfo;
+    displayMediaInfo(mediaInfo);
 
     try {
         if (mediaFile?.type.includes('text')) throw new Error('Wrong file type!');
@@ -89,9 +94,10 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
             Trying to fetch it one more time.`
         );
         fetchAndStoreRemoteFile(mediaInfo.filename);
-    } finally {
-        filenameDisplay.innerText = `${id}: ${originalFilename}`;
-    }
+    } /* finally {
+        // filenameDisplay.innerText = `${id}: ${originalFilename}`;
+        displayMediaInfo(mediaInfo);
+    } */
 }
 
 let nextMedia = null;
@@ -143,3 +149,5 @@ async function playAgainNext() {
 
     setMedia({ mediaInfo, mediaFile });
 }
+
+export { audio };
