@@ -13,14 +13,18 @@ export default function setPlayer() {
     audio.addEventListener('timeupdate', () => {
         const improvedDuration = audio.duration || 0; // can be NaN
 
-        if (lastTime + 0.5 <= audio.currentTime) {
-            lastTime = audio.currentTime;
+        // if (lastTime + 0.5 <= audio.currentTime) {
+        //     lastTime = audio.currentTime;
 
-            timeDisplay.innerText
-                = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
+        //     timeDisplay.innerText
+        //         = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
 
-            progressBar.value = audio.currentTime / audio.duration * 1000 || 0;
-        }            
+        //     progressBar.value = audio.currentTime / audio.duration * 1000 || 0;
+        // }         
+        timeDisplay.innerText
+            = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
+
+        progressBar.value = audio.currentTime / audio.duration * 1000 || 0;   
     });
 
     progressBar.addEventListener('input', () => {
