@@ -9,23 +9,18 @@ export default function setPlayer() {
     const volumeControl = document.getElementById('volume');
 
     // progresss 
-    let times = '0:00 / 0:00';
+    let lastTime = 0;
     audio.addEventListener('timeupdate', () => {
         const improvedDuration = audio.duration || 0; // can be NaN
 
-        // progressBar.value = audio.currentTime / audio.duration * 1000 || 0;
+        if (lastTime + 0.5 <= audio.currentTime) {
+            lastTime = audio.currentTime;
 
-        const timesUpdated
-            = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
-
-        if (timesUpdated !== times) {
-            times = timesUpdated;
-            timeDisplay.innerText = times;
+            timeDisplay.innerText
+                = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
 
             progressBar.value = audio.currentTime / audio.duration * 1000 || 0;
         }            
-
-        console.log(`${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`);
     });
 
     progressBar.addEventListener('input', () => {
