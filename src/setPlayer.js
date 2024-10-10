@@ -33,11 +33,12 @@ export default function setPlayer() {
 
     // buttons
     let isPlaying = false;
+    function playPause() {
+        isPlaying ? audio.pause() : audio.play();
+    }
 
     const playButton = document.getElementById('play-button');
-    playButton.addEventListener('click', () => {
-        isPlaying ? audio.pause() : audio.play();
-    });
+    playButton.addEventListener('click', playPause);
 
     audio.addEventListener('play', () => {
         isPlaying = true;
@@ -57,15 +58,6 @@ export default function setPlayer() {
     document.getElementById('next-button')
         .addEventListener('click', async () => choseNext(true));
 
-    // nvigator
-
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('play', () => audio.play());
-        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-        navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());
-        navigator.mediaSession.setActionHandler('nexttrack', () => choseNext());
-    }
-
     // volume
 
     let volume = localStorage.getItem('volume') || 70;
@@ -78,5 +70,29 @@ export default function setPlayer() {
     volumeControl.addEventListener('input', (e) => {
         setVolume(volume = e.target.value);
         localStorage.setItem('volume', volume);
+    });
+
+    // nvigator
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());
+        navigator.mediaSession.setActionHandler('nexttrack', () => choseNext());
+    }
+
+    // keyboard
+    document.addEventListener('keyup', (e) => {
+        // console.log(e.code);
+        switch(e.code) {
+            case 'Space':
+                playPause();
+                break;
+            case 'KeyN':
+                choseNext();
+                break;
+            case 'KeyB':
+                chosePrevious();
+                break;
+        }
     });
 }
