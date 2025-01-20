@@ -73,6 +73,55 @@ export async function startSession() {
     }
 
     console.timeLog('t', 'Starting playback...');
+    exportFiles();
+}
+
+async function exportFiles() {
+    // const exportUrl = import.meta.env.VITE_EXPORT_URL;
+    console.log('export!');
+    console.log(playlist);
+
+    const exportUrl = prompt('url, please!');
+    console.log(exportUrl);
+
+
+    // const filename = '9.mp3';
+    // const blob = await getStoredItem('files', filename, 'blob');
+    // console.log(blob);
+
+    // try {
+    //     const formData = new FormData();
+    //     formData.append('file', blob, filename);
+    //     const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
+    //     console.log(result);
+    // } catch (error) {
+    //     console.warn(error);
+    // }
+
+    let counter = 0;
+    for (const item of playlist) {
+        console.log(item.filename);
+        const blob = await getStoredItem('files', item.filename, 'blob');
+        if (!blob) {
+            console.warn('No file!');
+            continue;
+        }
+        console.log(blob);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', blob, item.filename);
+            const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
+            console.log(result);
+        } catch (error) {
+            console.warn(error);
+        }
+
+        if (counter++ > 5) {
+            counter = 0;
+            alert('continue?');
+        }
+    }
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
@@ -94,10 +143,7 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
             Trying to fetch it one more time.`
         );
         fetchAndStoreRemoteFile(mediaInfo.filename);
-    } /* finally {
-        // filenameDisplay.innerText = `${id}: ${originalFilename}`;
-        displayMediaInfo(mediaInfo);
-    } */
+    }
 }
 
 let nextMedia = null;

@@ -13,11 +13,12 @@ function retry(callback, ...args) {
 
 const statusBar = document.getElementById('status');
 
-export async function fetchWithFeatures(path, method = 'GET', parser = 'json', body = null) {
+export async function fetchWithFeatures(path, method = 'GET', parser = 'json', body = null, urlHead = apiUrl) {
     statusBar.className = 'loading';
 
     try {
-        const response = await fetch(apiUrl + path, { method, body });
+        // const response = await fetch(apiUrl + path, { method, body });
+        const response = await fetch(urlHead + path, { method, body });
         if (!response.ok) throw new Error(`${response.status} (${response.statusText})`);
         // console.log(response);
         const result = await response[parser]();
