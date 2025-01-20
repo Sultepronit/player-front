@@ -73,7 +73,7 @@ export async function startSession() {
     }
 
     console.timeLog('t', 'Starting playback...');
-    exportFiles();
+    // exportFiles();
 }
 
 async function exportFiles() {
@@ -83,20 +83,6 @@ async function exportFiles() {
 
     const exportUrl = prompt('url, please!');
     console.log(exportUrl);
-
-
-    // const filename = '9.mp3';
-    // const blob = await getStoredItem('files', filename, 'blob');
-    // console.log(blob);
-
-    // try {
-    //     const formData = new FormData();
-    //     formData.append('file', blob, filename);
-    //     const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
-    //     console.log(result);
-    // } catch (error) {
-    //     console.warn(error);
-    // }
 
     let counter = 0;
     for (const item of playlist) {
@@ -117,7 +103,7 @@ async function exportFiles() {
             console.warn(error);
         }
 
-        if (counter++ > 5) {
+        if (counter++ > 10) {
             counter = 0;
             alert('continue?');
         }
