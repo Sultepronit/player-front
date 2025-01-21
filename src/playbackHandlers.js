@@ -5,6 +5,7 @@ import { restoreTime, saveTime } from '../services/timeSaver';
 import displayMediaInfo from './displayMediaInfo';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
+import { getCollection, setDocument } from './services/api/firestore';
 
 const audio = new Audio();
 
@@ -26,7 +27,8 @@ function startFromScratch() {
 }
 
 async function updatePlayList() {
-    const newPlaylist = await fetchWithFeatures('/list');
+    // const newPlaylist = await fetchWithFeatures('/list');
+    const newPlaylist = await getCollection('list-details');
     console.log('updated playlist:', newPlaylist);
 
     if (newPlaylist.length > playlist.length) {
@@ -74,6 +76,21 @@ export async function startSession() {
 
     console.timeLog('t', 'Starting playback...');
     // exportFiles();
+    // getCollection('list-details');
+    // exportList();
+}
+
+async function exportList() {
+    console.log('export!');
+    console.log(playlist);
+    for (const item of playlist) {
+        console.log(item);
+        await setDocument('list-details', String(item.id), {
+            filename: item.filename,
+            originalFilename: item.originalFilename,
+            rating: 90
+        });
+    }
 }
 
 async function exportFiles() {

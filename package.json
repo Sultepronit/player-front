@@ -11,5 +11,8 @@
   "devDependencies": {
     "vite": "^5.4.1",
     "vite-plugin-pwa": "^0.20.5"
+  },
+  "dependencies": {
+    "firebase": "^11.2.0"
   }
 }
