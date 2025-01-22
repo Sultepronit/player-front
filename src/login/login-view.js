@@ -27,7 +27,7 @@ export default class LoginView extends HTMLElement {
             e.preventDefault();
             // console.log(e);
             const formData = new FormData(e.target);
-            signIn(formData.get('login'), formData.get('pass'));
+            signIn(formData.get('email'), formData.get('pass'));
         });
     }
 }

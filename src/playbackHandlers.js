@@ -2,7 +2,7 @@ import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
 import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
-import { getCurrentMedia, setCurrentMedia } from './currentMedia';
+import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
 import { getCollection, setDocument } from './services/api/firestore';
@@ -18,7 +18,7 @@ let history = {
     inPast: 0,
 }
 
-setInterval(() => saveTime(), 30 * 1000);
+setInterval(() => saveTime(), 10 * 1000);
 
 function startFromScratch() {
     history.future.push(...playlist.keys());
@@ -175,6 +175,11 @@ let isBusy = false;
 export async function choseNext(play = true) {
     if (history.inPast < 0) return playAgainNext();
 
+    if (play) {
+        // if (audio.currentTime < 60) changeRating(-2)
+        changeRating(audio.currentTime < 60 ? -2 : 1);
+    }
+
     if (isBusy) {
         addMessage('Please, wait a bit!');
         return;
@@ -187,7 +192,7 @@ export async function choseNext(play = true) {
     history.future = history.future.filter(index => index !== nextMedia.mediaIndex);
     history.past.push(nextMedia.mediaIndex);
 
-    if (history.past.length > history.future.length) {
+    if (history.past.length * 2 > history.future.length) {
         history.future.push(history.past.shift());
     }
 

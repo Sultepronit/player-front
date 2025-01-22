@@ -1,7 +1,7 @@
 const loginViewTemplate = `
 <section class="login-view hiddens">
     <form id="login-form">
-        <input type="text" name="login" placeholder="email">
+        <input type="email" name="email" placeholder="email">
         <div class="password-container">
             <input type="password" name="pass" id="passwordInput" placeholder="password">
             <!-- <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span> -->

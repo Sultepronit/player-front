@@ -47,13 +47,12 @@ function tryAndFindAcceptable(playlist, futureList) {
     const mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
     const mediaInfo = playlist[mediaIndex];
 
-    console.log(mediaInfo, minRating, limit);
-
+    // console.log(minRating, mediaInfo, limit);
     if (mediaInfo.rating < minRating && limit++ < 1000) {
         return tryAndFindAcceptable(playlist, futureList);
     }
+    // console.log('Finish!');
 
-    console.log('Finish!');
     limit = 0;
     return { mediaIndex, mediaInfo };
 }
@@ -73,8 +72,16 @@ export async function tryAndFindAvailable(playlist, futureList) {
     // repeating time after time if no success, waiting for the file to become available
     console.log('searching for available file');
     for (let tries = 0; tries < 300; tries++) { // like 10 minutes of tries
+        let limit = 0;
         for (const mediaIndex of futureList) {
             const mediaInfo = playlist[mediaIndex];
+
+            // console.log(minRating, mediaInfo, limit);
+            if (mediaInfo.rating < minRating && limit++ < futureList.length / 2) {
+                continue;
+            }
+            // console.log('Finish!');
+
             const mediaFile = await getLocalFile(mediaInfo.filename);
             if(mediaFile) return { mediaIndex, mediaInfo, mediaFile };
         }
