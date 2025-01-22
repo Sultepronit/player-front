@@ -67,7 +67,7 @@ export async function startSession() {
     updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist');
 
-    if (playlist) {
+    if (playlist && playlist.length) {
         const restoredHistory = JSON.parse(localStorage.getItem('history'));
         console.log(restoredHistory);
         // const savedHistory = null;
