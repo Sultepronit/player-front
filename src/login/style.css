@@ -1,0 +1,45 @@
+* {
+    font-size: 1.5rem;
+}
+
+.login-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: aliceblue;
+    z-index: 100;
+    display: grid;
+    justify-content: center;
+}
+
+/* .hidden {
+    display: none;
+} */
+
+form {
+    margin-top: 10rem;
+}
+
+input {
+    margin: 0.1rem;
+}
+
+button {
+    display: block;
+    margin: 0.2rem auto;
+}
+
+.password-container {
+    position: relative;
+    /* display: inline-block; */
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
