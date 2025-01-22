@@ -44,6 +44,11 @@ export function getCurrentMedia() {
 }
 
 export function changeRating(increment) {
+    if (increment === -1) {
+        increment = Math.round((currentMediaDetails.rating - 110) / 10);
+        console.log(increment);
+    }
+
     currentMediaDetails.rating += increment;
     if (currentMediaDetails.rating < 0) currentMediaDetails.rating = 0;
     if (currentMediaDetails.rating > 100) currentMediaDetails.rating = 100;

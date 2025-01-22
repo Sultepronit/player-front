@@ -176,8 +176,7 @@ export async function choseNext(play = true) {
     if (history.inPast < 0) return playAgainNext();
 
     if (play) {
-        // if (audio.currentTime < 60) changeRating(-2)
-        changeRating(audio.currentTime < 60 ? -2 : 1);
+        changeRating(audio.currentTime < 60 ? -1 : 1);
     }
 
     if (isBusy) {
