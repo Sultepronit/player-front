@@ -83,11 +83,14 @@ export async function startSession() {
 
         updatePlayList();
     } else {
-        playlist = await fetchWithFeatures('/list');
+        console.log('New start!');
+        // playlist = await fetchWithFeatures('/list');
+        const playlist = await getCollection('list-details');
 
         updatePlaylistView(playlist);
 
-        storeItem('details', { id: 'details', data: playlist });
+        // storeItem('details', { id: 'details', data: playlist });
+        backupPlaylist(updates);
 
         startFromScratch();
     }

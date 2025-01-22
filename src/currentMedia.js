@@ -1,7 +1,7 @@
 import updateMediaDetails from "./services/updateMediaDetails";
 
 const filenameDisplay = document.getElementById('filename');
-const raringDisplay = document.getElementById('media-rating');
+const ratingDisplay = document.getElementById('media-rating');
 
 let currentMediaDetails = null;
 
@@ -9,13 +9,16 @@ function displayMediaInfo(details) {
     const title = `${details.id}: ${details.originalFilename}`;
     filenameDisplay.innerText = title;
 
-    raringDisplay.innerText = details.rating;
+    const album = details.originalFilename.split('/')[0];
+    // console.log(album);
+
+    ratingDisplay.innerText = details.rating;
 
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title,
-            artist: 'Artist Name',
-            album: 'Album Name',
+            // artist: 'Artist Name',
+            album,
         //     artwork: [
         //         { src: 'cover.jpg', sizes: '96x96', type: 'image/jpg' },
         //         { src: 'cover.jpg', sizes: '128x128', type: 'image/jpg' },
@@ -49,5 +52,5 @@ export function changeRating(increment) {
 
     updateMediaDetails(currentMediaDetails);
 
-    raringDisplay.innerText = currentMediaDetails.rating;
+    ratingDisplay.innerText = currentMediaDetails.rating;
 }
