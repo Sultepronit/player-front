@@ -8,7 +8,6 @@ function openLocalDb() {
         request.onupgradeneeded = () => {
             console.log('upgrading indexedDB!');
             const db = request.result;
-            // db.createObjectStore('details', { keyPath: 'id' });
             db.createObjectStore('playlist', { keyPath: 'id' });
             if (!db.objectStoreNames.contains('files')) {
                 db.createObjectStore('files', { keyPath: 'filename' });

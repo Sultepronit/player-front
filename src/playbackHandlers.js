@@ -26,7 +26,7 @@ function startFromScratch() {
     choseNext(false);
 }
 
-async function updatePlayList() {
+export async function updatePlayList() {
     // const newPlaylist = await fetchWithFeatures('/list');
     const remotePlaylist = await getCollection('list-details');
     console.log('remote playlist:', remotePlaylist);

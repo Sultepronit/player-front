@@ -1,4 +1,4 @@
-import { audio, choseNext, chosePrevious } from "./playbackHandlers";
+import { audio, choseNext, chosePrevious, updatePlayList } from "./playbackHandlers";
 import { saveTime } from "../services/timeSaver";
 import formateSeconds from "../helpers/formateSeconds";
 import { changeRating } from "./currentMedia";
@@ -44,7 +44,8 @@ export default function setPlayer() {
     audio.addEventListener('play', () => {
         isPlaying = true;
         playButton.innerText = '⏸️';
-        saveTime();
+        // saveTime();
+        updatePlayList();
     });
 
     audio.addEventListener('pause', () => {

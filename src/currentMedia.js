@@ -6,17 +6,22 @@ const ratingDisplay = document.getElementById('media-rating');
 let currentMediaDetails = null;
 
 function displayMediaInfo(details) { 
-    const title = `${details.id}: ${details.originalFilename}`;
-    filenameDisplay.innerText = title;
+    ratingDisplay.innerText = details.rating;
 
-    const album = details.originalFilename.split('/')[0];
+    // const title = `${details.id}: ${details.originalFilename}`;
+    // filenameDisplay.innerText = title;
+    filenameDisplay.innerText = `${details.id}: ${details.originalFilename}`;
+
+    const year = details.originalFilename.split('/')[0];
+    const album = `${year}/${details.id}`;
     // console.log(album);
 
-    ratingDisplay.innerText = details.rating;
+    const fileName = details.originalFilename.replace(`${year}/`, '');
+    // console.log(fileName);
 
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
-            title,
+            title: fileName,
             // artist: 'Artist Name',
             album,
         //     artwork: [
@@ -33,11 +38,6 @@ export function setCurrentMedia(details) {
     currentMediaDetails = details;
     displayMediaInfo(details);
 }
-
-// export function refreshCurrentMedia() {
-//     console.log(currentMediaDetails);
-//     const refreshed = 
-// }
 
 export function getCurrentMedia() {
     return currentMediaDetails;
