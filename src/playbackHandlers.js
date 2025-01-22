@@ -90,7 +90,7 @@ export async function startSession() {
         updatePlaylistView(playlist);
 
         // storeItem('details', { id: 'details', data: playlist });
-        backupPlaylist(updates);
+        backupPlaylist(playlist);
 
         startFromScratch();
     }
