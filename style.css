@@ -74,12 +74,17 @@ main {
     /* float: right; */
 }
 
+.media-info {
+    display: flex;
+    justify-content: space-between;
+}
+
 .nav-buttons {
     clear: both;
     display: flex;
     font-size: 3rem;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.6rem;
 }
 
 #time {

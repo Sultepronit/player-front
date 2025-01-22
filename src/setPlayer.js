@@ -1,6 +1,7 @@
 import { audio, choseNext, chosePrevious } from "./playbackHandlers";
 import { saveTime } from "../services/timeSaver";
 import formateSeconds from "../helpers/formateSeconds";
+import { changeRating } from "./currentMedia";
 
 export default function setPlayer() {
     // html elements
@@ -57,6 +58,14 @@ export default function setPlayer() {
 
     document.getElementById('next-button')
         .addEventListener('click', async () => choseNext(true));
+
+    document.getElementById('uprade-rating').addEventListener('click', () => {
+        changeRating(5);
+    });
+
+    document.getElementById('degrade-rating').addEventListener('click', () => {
+        changeRating(-5);
+    });
 
     // volume
 

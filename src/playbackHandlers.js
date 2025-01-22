@@ -1,8 +1,8 @@
 import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
-import { getStoredItem, storeItem } from "../services/localDbHandlers";
+import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
-import displayMediaInfo from './displayMediaInfo';
+import { getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
 import { getCollection, setDocument } from './services/api/firestore';
@@ -28,26 +28,44 @@ function startFromScratch() {
 
 async function updatePlayList() {
     // const newPlaylist = await fetchWithFeatures('/list');
-    const newPlaylist = await getCollection('list-details');
-    console.log('updated playlist:', newPlaylist);
+    const remotePlaylist = await getCollection('list-details');
+    console.log('remote playlist:', remotePlaylist);
 
-    if (newPlaylist.length > playlist.length) {
-        history.future = [...newPlaylist.keys()]
+    if (remotePlaylist.length > playlist.length) {
+        history.future = [...remotePlaylist.keys()]
             .filter((index) => !history.past.includes(index));
         console.log(history);
         localStorage.setItem('history', JSON.stringify(history));
     }
 
-    playlist = newPlaylist;
-    updatePlaylistView(newPlaylist);
-    storeItem('details', { id: 'details', data: newPlaylist });
+    const updates = remotePlaylist.filter((entry, index) => {
+        for (const field of Object.keys(entry)) {
+            if (!playlist[index]) return true;
+            if (entry[field] !== playlist[index][field]) return true;
+        }
+        return false;
+    });
+    console.log('updates:', updates);
+
+    if (!updates.length) return;
+
+    playlist = remotePlaylist;
+    updatePlaylistView(remotePlaylist);
+
+    const currentMedia = getCurrentMedia();
+    setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
+
+    // storeItem('details', { id: 'details', data: newPlaylist });
+    // backupPlaylist(remotePlaylist);
+    backupPlaylist(updates);
 }
 
 export async function startSession() {
-    playlist = await getStoredItem('details', 'details', 'data');
+    // playlist = await getStoredItem('details', 'details', 'data');
+    playlist = await resotrePlaylist();
     console.log(playlist);
     updatePlaylistView(playlist);
-    console.timeLog('t', 'Restored playlist(?)');
+    console.timeLog('t', 'Restored playlist');
 
     if (playlist) {
         const restoredHistory = JSON.parse(localStorage.getItem('history'));
@@ -130,7 +148,7 @@ async function exportFiles() {
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
     console.log('setting:', mediaInfo, mediaFile );
     // const { id, originalFilename } = mediaInfo;
-    displayMediaInfo(mediaInfo);
+    setCurrentMedia(mediaInfo);
 
     try {
         if (mediaFile?.type.includes('text')) throw new Error('Wrong file type!');

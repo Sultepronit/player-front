@@ -39,27 +39,28 @@
                 <button type="submit">upload</button>
             </form>
         </section>
+
+        <div class="volume">
+            <label for="volume">🔊</label>
+            <input type="range" name="volume" id="volume" min="0" max="100" value="70">
+        </div>
     
         <section class="playlist-view">
-            <ul id="playlist">
-    
-            </ul>
+            <ul id="playlist"> </ul>
         </section>
     
-        <section class="player">    
-            <div class="volume">
-                <label for="volume">🔊</label>
-                <input type="range" name="volume" id="volume" min="0" max="100" value="70">
-            </div>
-    
-            <p id="filename">filename</p>
+        <section class="player">     
+            <div class="media-info">
+                <p id="filename">filename</p>
+                <p id="media-rating">#</p>
+            </div>   
 
             <div class="nav-buttons">
-                <p id="puprade-rating">👍</p>
+                <p id="uprade-rating" title="U">👍</p>
                 <p id="prev-button" title="B">⏮️</p>
-                <p id="play-button" title="space">▶️</p>
+                <p id="play-button" title="Space">▶️</p>
                 <p id="next-button" title="N">⏭️</p>
-                <p id="degrade-rating">👎</p>
+                <p id="degrade-rating" title="D">👎</p>
             </div>
     
             <div class="progress">
