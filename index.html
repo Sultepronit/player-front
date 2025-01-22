@@ -42,10 +42,19 @@
             </form>
         </section>
 
-        <div class="volume">
-            <label for="volume">🔊</label>
-            <input type="range" name="volume" id="volume" min="0" max="100" value="70">
-        </div>
+        <section>
+            <div class="volume">
+                <label for="volume">🔊</label>
+                <input type="range" name="volume" id="volume" min="0" max="100" value="70">
+            </div>
+            <div>
+                <!-- <label for="volume">🔊</label> -->
+                <span>👎</span>
+                <input type="range" name="rating" id="rating" min="0" max="100" value="50">
+                <span>👍</span>
+            </div>
+        </section>
+        
     
         <section class="playlist-view">
             <ul id="playlist"> </ul>

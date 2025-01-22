@@ -36,10 +36,33 @@ export async function fetchAndStoreRemoteFile(filename) {
     reduceQueue();
 }
 
-export async function tryAndFindAvailable(playlist, futureList) {
-    // trying to get random file
+let minRating = 50;
+document.getElementById('rating').addEventListener('change', (e) => {
+    console.log(e.target.value);
+    minRating = e.target.value;
+});
+
+let limit = 0;
+function tryAndFindAcceptable(playlist, futureList) {
     const mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
     const mediaInfo = playlist[mediaIndex];
+
+    console.log(mediaInfo, minRating, limit);
+
+    if (mediaInfo.rating < minRating && limit++ < 1000) {
+        return tryAndFindAcceptable(playlist, futureList);
+    }
+
+    console.log('Finish!');
+    limit = 0;
+    return { mediaIndex, mediaInfo };
+}
+
+export async function tryAndFindAvailable(playlist, futureList) {
+    // trying to get random file
+    // const mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
+    // const mediaInfo = playlist[mediaIndex];
+    const { mediaIndex, mediaInfo } = tryAndFindAcceptable(playlist, futureList);
     const mediaFile = await getLocalFile(mediaInfo.filename);
     if(mediaFile) return { mediaIndex, mediaInfo, mediaFile };
 
