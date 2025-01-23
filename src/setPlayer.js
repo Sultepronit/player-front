@@ -1,7 +1,7 @@
 import { audio, choseNext, chosePrevious, updatePlayList } from "./playbackHandlers";
 import { saveTime } from "../services/timeSaver";
 import formateSeconds from "../helpers/formateSeconds";
-import { changeRating } from "./currentMedia";
+import { changeRating, changeVolume as changeTrackVolume } from "./currentMedia";
 
 export default function setPlayer() {
     // html elements
@@ -79,11 +79,10 @@ export default function setPlayer() {
     // gainNode.gain.value = 4;
 
     let volume = localStorage.getItem('volume') || 70;
-    let trackVolume = trackVolumeControl.value;
 
     function setVolume() {
-        console.log(volume, trackVolume)
-        const inputVolume = volume * trackVolume / 10000;
+        console.log(volume, trackVolumeControl.value)
+        const inputVolume = volume * trackVolumeControl.value / 10000;
         console.log(inputVolume);
         // audio.volume = volume / 100;
         audio.volume = inputVolume > 1 ? 1 : inputVolume;
@@ -98,12 +97,19 @@ export default function setPlayer() {
         setVolume();
     });
 
+    trackVolumeControl.addEventListener('jsInput', setVolume);
+
     trackVolumeControl.addEventListener('input', () => {
-        trackVolume = trackVolumeControl.value;
+        changeTrackVolume(trackVolumeControl.value);
         setVolume();
     });
 
-    // nvigator
+    // setInterval(() => {
+    //     trackVolumeControl.value++;
+    //     trackVolumeControl.dispatchEvent(new Event('input'));
+    // }, 1000);
+
+    // navigator
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', () => audio.play());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());

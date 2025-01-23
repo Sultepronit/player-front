@@ -59,14 +59,15 @@
             <ul id="playlist"> </ul>
         </section>
     
-        <section class="player">     
+        <section class="player">    
+            <p id="filename">filename</p> 
             <div class="media-info">
-                <p id="filename">filename</p>
-                <p id="media-rating">#</p>
                 <div class="volume">
                     <label for="track-volume">🔊</label>
-                    <input type="range" name="track-volume" id="track-volume" min="0" max="200" value="100">
+                    <input type="range" name="track-volume" id="track-volume" min="1" max="200" value="100">
                 </div>
+                
+                <p id="media-rating">#</p>
             </div>   
 
             <div class="nav-buttons">

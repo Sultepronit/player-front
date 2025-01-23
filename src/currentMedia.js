@@ -2,6 +2,7 @@ import updateMediaDetails from "./services/updateMediaDetails";
 
 const filenameDisplay = document.getElementById('filename');
 const ratingDisplay = document.getElementById('media-rating');
+const trackVolumeControl = document.getElementById('track-volume');
 
 let currentMediaDetails = null;
 
@@ -37,6 +38,9 @@ export function setCurrentMedia(details) {
     console.log(details);
     currentMediaDetails = details;
     displayMediaInfo(details);
+
+    trackVolumeControl.value = details.volume || 100;
+    trackVolumeControl.dispatchEvent(new Event('jsInput'));
 }
 
 export function getCurrentMedia() {
@@ -58,4 +62,12 @@ export function changeRating(increment) {
     updateMediaDetails(currentMediaDetails);
 
     ratingDisplay.innerText = currentMediaDetails.rating;
+}
+
+export function changeVolume(value) {
+    currentMediaDetails.volume = value;
+
+    console.log(currentMediaDetails);
+
+    updateMediaDetails(currentMediaDetails);
 }
