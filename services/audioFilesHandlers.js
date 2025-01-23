@@ -2,6 +2,8 @@ import setPause from "../helpers/setPause";
 import { fetchBlob } from "./api";
 import { getStoredItem, storeItem } from "./localDbHandlers";
 
+const ratingInput = document.getElementById('rating');
+
 export async function getLocalFile(filename) {
     return await getStoredItem('files', filename, 'blob');
 }
@@ -36,11 +38,11 @@ export async function fetchAndStoreRemoteFile(filename) {
     reduceQueue();
 }
 
-let minRating = 50;
-document.getElementById('rating').addEventListener('change', (e) => {
-    console.log(e.target.value);
-    minRating = e.target.value;
-});
+// let minRating = 50;
+// document.getElementById('rating').addEventListener('change', (e) => {
+//     // console.log(e.target.value);
+//     minRating = e.target.value;
+// });
 
 let limit = 0;
 function tryAndFindAcceptable(playlist, futureList) {
@@ -48,7 +50,7 @@ function tryAndFindAcceptable(playlist, futureList) {
     const mediaInfo = playlist[mediaIndex];
 
     // console.log(minRating, mediaInfo, limit);
-    if (mediaInfo.rating < minRating && limit++ < 1000) {
+    if (mediaInfo.rating < ratingInput.value && limit++ < 1000) {
         return tryAndFindAcceptable(playlist, futureList);
     }
     // console.log('Finish!');
@@ -77,7 +79,7 @@ export async function tryAndFindAvailable(playlist, futureList) {
             const mediaInfo = playlist[mediaIndex];
 
             // console.log(minRating, mediaInfo, limit);
-            if (mediaInfo.rating < minRating && limit++ < futureList.length / 2) {
+            if (mediaInfo.rating < ratingInput.value && limit++ < futureList.length / 2) {
                 continue;
             }
             // console.log('Finish!');

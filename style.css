@@ -63,8 +63,16 @@ main {
     margin-block: 0.5rem;
 }
 
+.rating {
+    /* display: flex; */
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+}
+
 #rating {
     width: calc(100% - 4em);
+    /* width: 400px; */
 }
 
 #playlist li {

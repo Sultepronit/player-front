@@ -18,6 +18,16 @@ let history = {
     inPast: 0,
 }
 
+const ratingFilteredDisplay = document.getElementById('rating-filtered');
+const ratingInput = document.getElementById('rating');
+
+function updateRatingDisplay() {
+    const filtered = playlist.filter(entry => entry.rating >= ratingInput.value).length;
+    ratingFilteredDisplay.innerText = `${ratingInput.value}: ${filtered}`;
+}
+
+ratingInput.addEventListener('change', updateRatingDisplay);
+
 setInterval(() => saveTime(), 10 * 1000);
 
 function startFromScratch() {
@@ -58,6 +68,7 @@ export async function updatePlayList() {
     // storeItem('details', { id: 'details', data: newPlaylist });
     // backupPlaylist(remotePlaylist);
     backupPlaylist(updates);
+    updateRatingDisplay();
 }
 
 export async function startSession() {
@@ -96,6 +107,8 @@ export async function startSession() {
     }
 
     console.timeLog('t', 'Starting playback...');
+
+    updateRatingDisplay();
     // exportFiles();
     // getCollection('list-details');
     // exportList();

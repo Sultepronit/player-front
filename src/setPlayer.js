@@ -78,22 +78,23 @@ export default function setPlayer() {
     gainNode.connect(audioCtx.destination);
     // gainNode.gain.value = 4;
 
-    let volume = localStorage.getItem('volume') || 70;
+    volumeControl.value = localStorage.getItem('volume') || 70;
+    // let volume = localStorage.getItem('volume') || 70;
 
     function setVolume() {
-        console.log(volume, trackVolumeControl.value)
-        const inputVolume = volume * trackVolumeControl.value / 10000;
-        console.log(inputVolume);
+        // console.log(volume, trackVolumeControl.value)
+        const inputVolume = volumeControl.value * trackVolumeControl.value / 10000;
+        // console.log(inputVolume);
         // audio.volume = volume / 100;
         audio.volume = inputVolume > 1 ? 1 : inputVolume;
         gainNode.gain.value = inputVolume > 1 ? inputVolume : 1;
     }
     setVolume();
 
-    volumeControl.value = volume;
+    // volumeControl.value = volume;
     volumeControl.addEventListener('input', () => {
-        volume = volumeControl.value;
-        localStorage.setItem('volume', volume);
+        // volume = volumeControl.value;
+        localStorage.setItem('volume', volumeControl.value);
         setVolume();
     });
 

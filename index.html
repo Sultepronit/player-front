@@ -47,14 +47,17 @@
                 <label for="volume">🔊</label>
                 <input type="range" name="volume" id="volume" min="0" max="100" value="70">
             </div>
-            <div>
-                <span>👎</span>
-                <input type="range" name="rating" id="rating" min="1" max="100" value="50">
-                <span>👍</span>
+            <div class="rating">
+                <p>
+                    <span>👎</span>
+                    <input type="range" name="rating" id="rating" min="1" max="100" value="50">
+                    <span>👍</span>
+                </p>
+                
+                <p id="rating-filtered">50: #</p>
             </div>
         </section>
         
-    
         <section class="playlist-view">
             <ul id="playlist"> </ul>
         </section>
@@ -66,7 +69,7 @@
                     <label for="track-volume">🔊</label>
                     <input type="range" name="track-volume" id="track-volume" min="1" max="200" value="100">
                 </div>
-                
+
                 <p id="media-rating">#</p>
             </div>   
 
