@@ -8,6 +8,7 @@ export default function setPlayer() {
     const timeDisplay = document.getElementById('time');
     const progressBar = document.getElementById('progressBar');
     const volumeControl = document.getElementById('volume');
+    const trackVolumeControl = document.getElementById('track-volume');
 
     // progresss 
     let lastTime = 0;
@@ -70,16 +71,36 @@ export default function setPlayer() {
 
     // volume
 
+    const audioCtx = new AudioContext();
+    const source = audioCtx.createMediaElementSource(audio);
+    const gainNode = audioCtx.createGain();
+    source.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    // gainNode.gain.value = 4;
+
     let volume = localStorage.getItem('volume') || 70;
+    let trackVolume = trackVolumeControl.value;
+
     function setVolume() {
-        audio.volume = volume / 100;
+        console.log(volume, trackVolume)
+        const inputVolume = volume * trackVolume / 10000;
+        console.log(inputVolume);
+        // audio.volume = volume / 100;
+        audio.volume = inputVolume > 1 ? 1 : inputVolume;
+        gainNode.gain.value = inputVolume > 1 ? inputVolume : 1;
     }
     setVolume();
 
     volumeControl.value = volume;
-    volumeControl.addEventListener('input', (e) => {
-        setVolume(volume = e.target.value);
+    volumeControl.addEventListener('input', () => {
+        volume = volumeControl.value;
         localStorage.setItem('volume', volume);
+        setVolume();
+    });
+
+    trackVolumeControl.addEventListener('input', () => {
+        trackVolume = trackVolumeControl.value;
+        setVolume();
     });
 
     // nvigator
