@@ -6,6 +6,7 @@ import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
 import { getCollection, setDocument } from './services/api/firestore';
+import { uploadBlob } from './services/api/storage';
 
 const audio = new Audio();
 
@@ -65,14 +66,11 @@ export async function updatePlayList() {
     const currentMedia = getCurrentMedia();
     setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
 
-    // storeItem('details', { id: 'details', data: newPlaylist });
-    // backupPlaylist(remotePlaylist);
     backupPlaylist(updates);
     updateRatingDisplay();
 }
 
 export async function startSession() {
-    // playlist = await getStoredItem('details', 'details', 'data');
     playlist = await resotrePlaylist();
     console.log(playlist);
     updatePlaylistView(playlist);
@@ -100,7 +98,6 @@ export async function startSession() {
 
         updatePlaylistView(playlist);
 
-        // storeItem('details', { id: 'details', data: playlist });
         backupPlaylist(playlist);
 
         startFromScratch();
@@ -128,15 +125,16 @@ async function exportList() {
 }
 
 async function exportFiles() {
-    // const exportUrl = import.meta.env.VITE_EXPORT_URL;
     console.log('export!');
     console.log(playlist);
 
-    const exportUrl = prompt('url, please!');
-    console.log(exportUrl);
+    // const exportUrl = prompt('url, please!');
+    // console.log(exportUrl);
 
     let counter = 0;
-    for (const item of playlist) {
+    // for (const item of playlist) {
+    for (let i = 1; i < playlist.length; i++) {
+        const item = playlist[i];
         console.log(item.filename);
         const blob = await getStoredItem('files', item.filename, 'blob');
         if (!blob) {
@@ -145,19 +143,23 @@ async function exportFiles() {
         }
         console.log(blob);
 
-        try {
-            const formData = new FormData();
-            formData.append('file', blob, item.filename);
-            const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
-            console.log(result);
-        } catch (error) {
-            console.warn(error);
-        }
+        // await uploadBlob(item.filename, blob);
+        await uploadBlob(blob, 'audio', item.filename);
 
-        if (counter++ > 10) {
-            counter = 0;
-            alert('continue?');
-        }
+        // try {
+        //     const formData = new FormData();
+        //     formData.append('file', blob, item.filename);
+        //     const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
+        //     console.log(result);
+        // } catch (error) {
+        //     console.warn(error);
+        // }
+
+        // if (counter++ > 0) {
+        //     counter = 0;
+        //     alert('continue?');
+        // }
+        break;
     }
 }
 
