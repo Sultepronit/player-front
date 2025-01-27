@@ -71,11 +71,11 @@ export default function setPlayer() {
 
     // volume
 
-    const audioCtx = new AudioContext();
-    const source = audioCtx.createMediaElementSource(audio);
-    const gainNode = audioCtx.createGain();
-    source.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    // const audioCtx = new AudioContext();
+    // const source = audioCtx.createMediaElementSource(audio);
+    // const gainNode = audioCtx.createGain();
+    // source.connect(gainNode);
+    // gainNode.connect(audioCtx.destination);
     // gainNode.gain.value = 4;
 
     volumeControl.value = localStorage.getItem('volume') || 70;
@@ -87,7 +87,7 @@ export default function setPlayer() {
         // console.log(inputVolume);
         // audio.volume = volume / 100;
         audio.volume = inputVolume > 1 ? 1 : inputVolume;
-        gainNode.gain.value = inputVolume > 1 ? inputVolume : 1;
+        // gainNode.gain.value = inputVolume > 1 ? inputVolume : 1;
     }
     setVolume();
 

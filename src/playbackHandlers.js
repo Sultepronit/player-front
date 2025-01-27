@@ -70,6 +70,7 @@ export async function updatePlayList() {
     updateRatingDisplay();
 }
 
+const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
 export async function startSession() {
     playlist = await resotrePlaylist();
     console.log(playlist);
@@ -90,7 +91,7 @@ export async function startSession() {
             startFromScratch();
         }
 
-        updatePlayList();
+        if (!devNotUpdate) updatePlayList();
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
@@ -191,7 +192,7 @@ export async function choseNext(play = true) {
     if (history.inPast < 0) return playAgainNext();
 
     if (play) {
-        changeRating(audio.currentTime < 60 ? -1 : 1);
+        changeRating(audio.currentTime < 60 ? -3 : 1);
     }
 
     if (isBusy) {
