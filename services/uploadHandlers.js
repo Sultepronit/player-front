@@ -1,4 +1,6 @@
-import { fetchWithFeatures } from "./api";
+import { getCollection } from "../src/services/api/firestore";
+import { uploadBlob } from "../src/services/api/storage";
+import { fetchBlob, fetchWithFeatures } from "./api";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -26,15 +28,32 @@ export function updatelistView() {
     uploadList.innerHTML = newView;
 }
 
+let lastId = 1000;
+function prepareDetails(inputName) {
+    console.log(inputName);
+    const dotIndex = inputName.lastIndexOf('.');
+    return {
+        id: String(++lastId),
+        filename: `${lastId}.${inputName.substring(dotIndex + 1).toLowerCase()}`,
+        originalFilename: inputName.substring(0, dotIndex),
+        rating: 90
+    };
+}
+
 async function uploadRecursively() {
     const file = files.pop();
     console.log(file);
-    const formData = new FormData();
-    formData.append('file', file);
+    // const formData = new FormData();
+    // formData.append('file', file);
 
     try {
-        const result = await fetchWithFeatures('/upload', 'POST', 'text', formData);
-        console.log(result);
+        // const result = await fetchWithFeatures('/upload', 'POST', 'text', formData);
+        // console.log(result);
+        // uploadBlob(file, 'audio', '200.mpp');
+        const details = prepareDetails(file.name);
+        // uploadBlob(file, 'audio', filename);
+        console.log(details);
+        console.log('fake upload!');
     } catch (error) {
         console.warn(error);
     }
@@ -44,27 +63,14 @@ async function uploadRecursively() {
     if(files.length) uploadRecursively();
 }
 
+fetchBlob('999.pm3');
+
 export async function uploadFiles(e) {
     e.preventDefault();
 
-    uploadRecursively();
-    // console.log(files);
-    // console.log(fileInput.files.pop());
-    // for(const file of files) {
-    //     console.log(file);
-    //     const formData = new FormData();
-    //     formData.append('file', file);
+    const playlist = await getCollection();
+    // console.log(playlist.length + 1);
+    lastId = playlist.length;
 
-    //     try {
-    //         const response = await fetch(`${apiUrl}/upload`, {
-    //             // method: 'POST',
-    //             method: 'PATCH',
-    //             body: formData
-    //         });
-    //         const result = await response.text();
-    //         console.log(result);
-    //     } catch (error) {
-    //         console.warn(error);
-    //     }
-    // }
+    uploadRecursively();
 }

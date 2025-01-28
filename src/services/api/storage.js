@@ -1,4 +1,4 @@
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, getStorage, listAll, ref, uploadBytes } from 'firebase/storage';
 // import app from './app';
 
 const storage = getStorage();
@@ -8,8 +8,6 @@ console.log(storage);
 
 // export async function uploadBlob(filename, blob) {
 export async function uploadBlob(blob, folderPath, filename) {
-    console.log('here we go!');
-    // const storageRef = ref(storage, filename);
     const storageRef = ref(storage, `${folderPath}/${filename}`);
     await uploadBytes(storageRef, blob);
     console.log('Successfully uploaded!');
@@ -20,5 +18,7 @@ export async function getFileUrl(folderPath, filename) {
     return await getDownloadURL(fileRef);
 }
 
-// console.log(await getFileUrl('dir1', '56.txt'));
-// console.log(await getFileUrl('audio', '1.mp3'));
+// const listRef = ref(storage, 'audio');
+
+// const result = await listAll(listRef);
+// console.log(result);

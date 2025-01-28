@@ -3,9 +3,10 @@ import { collection, doc, getDocs, getFirestore, setDoc } from "firebase/firesto
 
 const db = getFirestore(app);
 
-export async function getCollection(name) {
-    const protocols = collection(db, name);
-    const querySnapshot = await getDocs(protocols);
+export async function getCollection(name = 'list-details') {
+    const details = collection(db, name);
+    const querySnapshot = await getDocs(details);
+    console.log(querySnapshot);
 
     const results = [];
     querySnapshot.forEach(doc => {

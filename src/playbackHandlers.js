@@ -61,7 +61,8 @@ export async function updatePlayList() {
     if (!updates.length) return;
 
     playlist = remotePlaylist;
-    updatePlaylistView(remotePlaylist);
+    playlist.sort((a, b) => a.id - b.id);
+    updatePlaylistView(playlist);
 
     const currentMedia = getCurrentMedia();
     setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
@@ -73,6 +74,7 @@ export async function updatePlayList() {
 const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
 export async function startSession() {
     playlist = await resotrePlaylist();
+    playlist.sort((a, b) => a.id - b.id);
     console.log(playlist);
     updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist');
@@ -96,6 +98,7 @@ export async function startSession() {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
         const playlist = await getCollection('list-details');
+        playlist.sort((a, b) => a.id - b.id);
 
         updatePlaylistView(playlist);
 
