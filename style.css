@@ -122,3 +122,9 @@ main {
 /* button {
     font-size: 3rem;
 } */
+
+@media screen and (max-width: 500px) {
+    .file-upload {
+        display: none;
+    }
+}

@@ -40,6 +40,7 @@ function startFromScratch() {
 export async function updatePlayList() {
     // const newPlaylist = await fetchWithFeatures('/list');
     const remotePlaylist = await getCollection('list-details');
+    remotePlaylist.sort((a, b) => a.id - b.id);
     console.log('remote playlist:', remotePlaylist);
 
     if (remotePlaylist.length > playlist.length) {
@@ -61,7 +62,7 @@ export async function updatePlayList() {
     if (!updates.length) return;
 
     playlist = remotePlaylist;
-    playlist.sort((a, b) => a.id - b.id);
+    // playlist.sort((a, b) => a.id - b.id);
     updatePlaylistView(playlist);
 
     const currentMedia = getCurrentMedia();

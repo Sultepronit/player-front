@@ -1,10 +1,8 @@
 import { getDownloadURL, getStorage, listAll, ref, uploadBytes } from 'firebase/storage';
-// import app from './app';
+import { fetchWithFeatures } from '../../../services/api';
 
 const storage = getStorage();
-// const storage = getStorage(app);
 console.log(storage);
-// console.log(app);
 
 // export async function uploadBlob(filename, blob) {
 export async function uploadBlob(blob, folderPath, filename) {
@@ -13,12 +11,36 @@ export async function uploadBlob(blob, folderPath, filename) {
     console.log('Successfully uploaded!');
 }
 
+export async function uploadToStorage(blob, filename, folderPath = 'audio') {
+    const storageRef = ref(storage, `${folderPath}/${filename}`);
+    await uploadBytes(storageRef, blob);
+    console.log('Successfully uploaded!');
+}
+
 export async function getFileUrl(folderPath, filename) {
     const fileRef = ref(storage, `${folderPath}/${filename}`);
-    return await getDownloadURL(fileRef);
+    try {
+        return await getDownloadURL(fileRef);   
+    } catch (error) {
+        return null;
+    }
+}
+
+export async function getFileFromStorage(filename, folderPath = 'audio') {
+    try {
+        const url = await getFileUrl(folderPath, filename);
+        console.log(url);
+        if (!url) return null;
+
+        return fetchWithFeatures(url, 'GET', 'blob', null, '');
+    } catch (error) {
+        return null;
+    }
 }
 
 // const listRef = ref(storage, 'audio');
 
 // const result = await listAll(listRef);
 // console.log(result);
+
+// console.log(await getFileFromStorage('1.mp374'));

@@ -1,12 +1,11 @@
-import { getCollection } from "../src/services/api/firestore";
-import { uploadBlob } from "../src/services/api/storage";
-import { fetchBlob, fetchWithFeatures } from "./api";
+import { getCollection, getCollectionSize, setDocument } from "./api/firestore";
+import { uploadBlob, uploadToStorage } from "./api/storage";
+import { fetchBlob, fetchWithFeatures } from "../../services/api";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 let files = [];
 
-// document.getElementById('uploadForm').addEventListener('submit', uploadFiles);
 const fileInput = document.getElementById('fileInput');
 const folderInput = document.getElementById('folderInput');
 const uploadList = document.getElementById('upload-list');
@@ -32,11 +31,12 @@ let lastId = 1000;
 function prepareDetails(inputName) {
     console.log(inputName);
     const dotIndex = inputName.lastIndexOf('.');
+    const year = new Date().getFullYear();
     return {
         id: String(++lastId),
         filename: `${lastId}.${inputName.substring(dotIndex + 1).toLowerCase()}`,
-        originalFilename: inputName.substring(0, dotIndex),
-        rating: 90
+        originalFilename: `${year}/${inputName.substring(0, dotIndex)}`,
+        rating: 100
     };
 }
 
@@ -52,8 +52,11 @@ async function uploadRecursively() {
         // uploadBlob(file, 'audio', '200.mpp');
         const details = prepareDetails(file.name);
         // uploadBlob(file, 'audio', filename);
-        console.log(details);
-        console.log('fake upload!');
+        // console.log(details);
+        // console.log('fake upload!');
+        await uploadToStorage(file, details.filename);
+        await setDocument('list-details', details.id, details);
+        console.log('uploaded', details);
     } catch (error) {
         console.warn(error);
     }
@@ -63,14 +66,15 @@ async function uploadRecursively() {
     if(files.length) uploadRecursively();
 }
 
-fetchBlob('999.pm3');
 
 export async function uploadFiles(e) {
     e.preventDefault();
 
-    const playlist = await getCollection();
+    // const playlist = await getCollection();
     // console.log(playlist.length + 1);
-    lastId = playlist.length;
+    // lastId = playlist.length;
+    lastId = await getCollectionSize();
+    // console.log()
 
     uploadRecursively();
 }

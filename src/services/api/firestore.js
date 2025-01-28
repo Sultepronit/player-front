@@ -4,9 +4,8 @@ import { collection, doc, getDocs, getFirestore, setDoc } from "firebase/firesto
 const db = getFirestore(app);
 
 export async function getCollection(name = 'list-details') {
-    const details = collection(db, name);
-    const querySnapshot = await getDocs(details);
-    console.log(querySnapshot);
+    const querySnapshot = await getDocs(collection(db, name));
+    // console.log(querySnapshot);
 
     const results = [];
     querySnapshot.forEach(doc => {
@@ -20,7 +19,13 @@ export async function getCollection(name = 'list-details') {
     return results;
 }
 
+export async function getCollectionSize(name = 'list-details') {
+    const querySnapshot = await getDocs(collection(db, name));
+    return querySnapshot.size;
+}
+
 // getCollection();
+// console.log(await getCollectionSize());
 
 export async function setDocument(collection, id, data) {
     try {

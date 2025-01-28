@@ -1,4 +1,5 @@
 import setPause from "../helpers/setPause";
+import { getFileFromStorage, getFileUrl } from "../src/services/api/storage";
 import { fetchBlob } from "./api";
 import { getStoredItem, storeItem } from "./localDbHandlers";
 
@@ -16,7 +17,9 @@ async function reduceQueue() {
     const filename = [...queue][0];
 
     console.log('fetching:', filename);
-    const audioBlob = await fetchBlob(filename);
+    // const audioBlob = await getFileFromStorage(filename);
+    // const audioBlob = await fetchBlob(filename);
+    const audioBlob = await getFileFromStorage(filename) || await fetchBlob(filename);
 
     await storeItem('files', { filename, blob: audioBlob });
     console.log('fetched:', filename, audioBlob);
