@@ -174,7 +174,7 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
     setCurrentMedia(mediaInfo);
 
     try {
-        if (mediaFile?.type.includes('text')) throw new Error('Wrong file type!');
+        if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
         audio.src = URL.createObjectURL(mediaFile);   
 
         if (play) await audio.play();
@@ -182,20 +182,17 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
         console.log(history);
         localStorage.setItem('history', JSON.stringify(history));
     } catch (error) { // no file is stored, or not a mediafile
-        addMessage(
-            `Get ${mediaFile?.type} instead of mediafile! <br>
-            Trying to fetch it one more time.`
-        );
+        addMessage(error.message);
         fetchAndStoreRemoteFile(mediaInfo.filename);
     }
 }
 
 let nextMedia = null;
 let isBusy = false;
-export async function choseNext(play = true) {
+export async function choseNext(play = true, ratingIsOk = false) {
     if (history.inPast < 0) return playAgainNext();
 
-    if (play) {
+    if (play && !ratingIsOk) {
         changeRating(audio.currentTime < 60 ? -3 : 1);
     }
 
@@ -205,20 +202,26 @@ export async function choseNext(play = true) {
     }
     isBusy = true;
 
+    console.log(nextMedia);
     if (!nextMedia) nextMedia = await tryAndFindAvailable(playlist, history.future);
-    // console.log(nextMedia);
 
     history.future = history.future.filter(index => index !== nextMedia.mediaIndex);
     history.past.push(nextMedia.mediaIndex);
 
-    if (history.past.length * 2 > history.future.length) {
+    if (history.past.length > history.future.length) {
         history.future.push(history.past.shift());
     }
 
-    setMedia(nextMedia, play);
-
-    nextMedia = null;
     isBusy = false;
+
+    console.log(nextMedia);
+    if(nextMedia.pass) {
+        nextMedia = null;
+        return choseNext(play, true);
+    }
+
+    setMedia(nextMedia, play);
+    nextMedia = null;
 
     nextMedia = await tryAndFindAvailable(playlist, history.future);
 }

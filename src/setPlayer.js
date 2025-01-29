@@ -35,8 +35,13 @@ export default function setPlayer() {
 
     // buttons
     let isPlaying = false;
+    function playManually() {
+        audio.play();
+        updatePlayList();
+    }
+
     function playPause() {
-        isPlaying ? audio.pause() : audio.play();
+        isPlaying ? audio.pause() : playManually();
     }
 
     const playButton = document.getElementById('play-button');
@@ -45,8 +50,8 @@ export default function setPlayer() {
     audio.addEventListener('play', () => {
         isPlaying = true;
         playButton.innerText = '⏸️';
-        // saveTime();
-        updatePlayList();
+        saveTime();
+        // updatePlayList();
     });
 
     audio.addEventListener('pause', () => {
@@ -112,7 +117,7 @@ export default function setPlayer() {
 
     // navigator
     if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('play', () => playManually());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());
         navigator.mediaSession.setActionHandler('nexttrack', () => choseNext());
