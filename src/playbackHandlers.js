@@ -187,7 +187,16 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
     }
 }
 
-let nextMedia = null;
+
+function updateHistory(mediaIndex) {
+    history.future = history.future.filter(index => index !== mediaIndex);
+    history.past.push(mediaIndex);
+
+    if (history.past.length > history.future.length) {
+        history.future.push(history.past.shift());
+    }
+}
+
 let isBusy = false;
 export async function choseNext(play = true, ratingIsOk = false) {
     if (history.inPast < 0) return playAgainNext();
@@ -200,30 +209,19 @@ export async function choseNext(play = true, ratingIsOk = false) {
         addMessage('Please, wait a bit!');
         return;
     }
+
     isBusy = true;
-
-    console.log(nextMedia);
-    if (!nextMedia) nextMedia = await tryAndFindAvailable(playlist, history.future);
-
-    history.future = history.future.filter(index => index !== nextMedia.mediaIndex);
-    history.past.push(nextMedia.mediaIndex);
-
-    if (history.past.length > history.future.length) {
-        history.future.push(history.past.shift());
-    }
-
+    const nextMedia = await tryAndFindAvailable(playlist, history.future);
     isBusy = false;
+
+    updateHistory(nextMedia.mediaIndex);
 
     console.log(nextMedia);
     if(nextMedia.pass) {
-        nextMedia = null;
         return choseNext(play, true);
     }
 
     setMedia(nextMedia, play);
-    nextMedia = null;
-
-    nextMedia = await tryAndFindAvailable(playlist, history.future);
 }
 
 export async function chosePrevious(play = true) {
