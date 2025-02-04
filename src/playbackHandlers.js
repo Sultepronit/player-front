@@ -112,7 +112,7 @@ export async function startSession() {
     console.timeLog('t', 'Starting playback...');
 
     updateRatingDisplay();
-    exportFiles(playlist);
+    // exportFiles(playlist);
     // exportList();
 }
 

@@ -24,7 +24,7 @@ export async function exportFiles(playlist) {
     to *= 1;
     console.log(from, to);
 
-    // let counter = 0;
+    let counter = 0;
     // for (const item of playlist) {
     for (let i = from; i <= to && i < playlist.length; i++) {
         const item = playlist[i];
@@ -47,10 +47,10 @@ export async function exportFiles(playlist) {
         //     console.warn(error);
         // }
 
-        // if (counter++ > 0) {
-        //     counter = 0;
-        //     alert('continue?');
-        // }
+        if (counter++ >= 10) {
+            counter = 0;
+            alert('continue?');
+        }
         // break;
     }
 }
