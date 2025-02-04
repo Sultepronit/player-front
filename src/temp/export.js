@@ -19,13 +19,14 @@ export async function exportFiles(playlist) {
     console.log(playlist);
 
     const fromTo = prompt('from, to?');
-    const [from, to] = fromTo.split(', ');
+    let [from, to] = fromTo.split(', ');
+    from *= 1;
+    to *= 1;
     console.log(from, to);
 
     // let counter = 0;
     // for (const item of playlist) {
-    for (let i = from; i < to && i < playlist.length; i++) {
-        // break;
+    for (let i = from; i <= to && i < playlist.length; i++) {
         const item = playlist[i];
         console.log(item.filename);
         const blob = await getStoredItem('files', item.filename, 'blob');
