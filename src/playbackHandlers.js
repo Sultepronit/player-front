@@ -1,4 +1,4 @@
-import { fetchWithFeatures } from '../services/api';
+// import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
 import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
@@ -6,7 +6,8 @@ import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
 import { updatePlaylistView } from './playlistDisplay';
 import { getCollection, setDocument } from './services/api/firestore';
-import { uploadBlob } from './services/api/storage';
+// import { uploadBlob } from './services/api/storage';
+import { exportFiles } from './temp/export';
 
 const audio = new Audio();
 
@@ -111,61 +112,8 @@ export async function startSession() {
     console.timeLog('t', 'Starting playback...');
 
     updateRatingDisplay();
-    // exportFiles();
-    // getCollection('list-details');
+    exportFiles(playlist);
     // exportList();
-}
-
-async function exportList() {
-    console.log('export!');
-    console.log(playlist);
-    for (const item of playlist) {
-        console.log(item);
-        await setDocument('list-details', String(item.id), {
-            filename: item.filename,
-            originalFilename: item.originalFilename,
-            rating: 90
-        });
-    }
-}
-
-async function exportFiles() {
-    console.log('export!');
-    console.log(playlist);
-
-    // const exportUrl = prompt('url, please!');
-    // console.log(exportUrl);
-
-    let counter = 0;
-    // for (const item of playlist) {
-    for (let i = 1; i < playlist.length; i++) {
-        const item = playlist[i];
-        console.log(item.filename);
-        const blob = await getStoredItem('files', item.filename, 'blob');
-        if (!blob) {
-            console.warn('No file!');
-            continue;
-        }
-        console.log(blob);
-
-        // await uploadBlob(item.filename, blob);
-        await uploadBlob(blob, 'audio', item.filename);
-
-        // try {
-        //     const formData = new FormData();
-        //     formData.append('file', blob, item.filename);
-        //     const result = await fetchWithFeatures('/import', 'POST', 'text', formData, exportUrl);
-        //     console.log(result);
-        // } catch (error) {
-        //     console.warn(error);
-        // }
-
-        // if (counter++ > 0) {
-        //     counter = 0;
-        //     alert('continue?');
-        // }
-        break;
-    }
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
@@ -202,7 +150,7 @@ export async function choseNext(play = true, ratingIsOk = false) {
     if (history.inPast < 0) return playAgainNext();
 
     if (play && !ratingIsOk) {
-        changeRating(audio.currentTime < 60 ? -3 : 1);
+        changeRating(audio.currentTime < 60 ? -4 : 1);
     }
 
     if (isBusy) {

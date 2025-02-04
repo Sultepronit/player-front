@@ -1,5 +1,5 @@
 import { getCollection, getCollectionSize, setDocument } from "./api/firestore";
-import { uploadBlob, uploadToStorage } from "./api/storage";
+import { uploadToStorage } from "./api/storage";
 import { fetchBlob, fetchWithFeatures } from "../../services/api";
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -49,11 +49,7 @@ async function uploadRecursively() {
     try {
         // const result = await fetchWithFeatures('/upload', 'POST', 'text', formData);
         // console.log(result);
-        // uploadBlob(file, 'audio', '200.mpp');
         const details = prepareDetails(file.name);
-        // uploadBlob(file, 'audio', filename);
-        // console.log(details);
-        // console.log('fake upload!');
         await uploadToStorage(file, details.filename);
         await setDocument('list-details', details.id, details);
         console.log('uploaded', details);

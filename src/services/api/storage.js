@@ -5,11 +5,11 @@ const storage = getStorage();
 console.log(storage);
 
 // export async function uploadBlob(filename, blob) {
-export async function uploadBlob(blob, folderPath, filename) {
-    const storageRef = ref(storage, `${folderPath}/${filename}`);
-    await uploadBytes(storageRef, blob);
-    console.log('Successfully uploaded!');
-}
+// export async function uploadBlob(blob, folderPath, filename) {
+//     const storageRef = ref(storage, `${folderPath}/${filename}`);
+//     await uploadBytes(storageRef, blob);
+//     console.log('Successfully uploaded!');
+// }
 
 export async function uploadToStorage(blob, filename, folderPath = 'audio') {
     const storageRef = ref(storage, `${folderPath}/${filename}`);
