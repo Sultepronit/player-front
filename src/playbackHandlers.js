@@ -9,7 +9,10 @@ import { getCollection, setDocument } from './services/api/firestore';
 // import { uploadBlob } from './services/api/storage';
 import { exportFiles } from './temp/export';
 
-const audio = new Audio();
+// const audio = new Audio();
+// const audio = new Video();
+const audio = document.getElementById('video');
+console.log(audio);
 
 audio.onended = () => choseNext(true);
 

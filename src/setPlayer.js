@@ -112,7 +112,7 @@ export default function setPlayer() {
 
     // navigator
     if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = 'playing'; // should prevents video from stopping
+        // navigator.mediaSession.playbackState = 'playing'; // should prevents video from stopping
         navigator.mediaSession.setActionHandler('play', () => playManually());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());
