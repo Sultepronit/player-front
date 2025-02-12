@@ -110,13 +110,9 @@ export default function setPlayer() {
         setVolume();
     });
 
-    // setInterval(() => {
-    //     trackVolumeControl.value++;
-    //     trackVolumeControl.dispatchEvent(new Event('input'));
-    // }, 1000);
-
     // navigator
     if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing'; // should prevents video from stopping
         navigator.mediaSession.setActionHandler('play', () => playManually());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         navigator.mediaSession.setActionHandler('previoustrack', () => chosePrevious());

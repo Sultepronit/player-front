@@ -17,7 +17,8 @@ async function reduceQueue() {
     const filename = [...queue][0];
 
     console.log('fetching:', filename);
-    const audioBlob = await getFileFromStorage(filename) || await fetchBlob(filename);
+    // const audioBlob = await getFileFromStorage(filename) || await fetchBlob(filename);
+    const audioBlob = await getFileFromStorage(filename);
 
     await storeItem('files', { filename, blob: audioBlob });
     console.log('fetched:', filename, audioBlob);

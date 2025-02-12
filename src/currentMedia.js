@@ -11,7 +11,7 @@ function displayMediaInfo(details) {
 
     // const title = `${details.id}: ${details.originalFilename}`;
     // filenameDisplay.innerText = title;
-    filenameDisplay.innerText = `${details.id}: ${details.originalFilename}`;
+    filenameDisplay.innerText = `${details.id}. ${details.originalFilename}`;
 
     const year = details.originalFilename.split('/')[0];
     const album = `${year}/${details.id}`;

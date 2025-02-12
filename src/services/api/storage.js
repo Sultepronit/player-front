@@ -1,4 +1,4 @@
-import { getDownloadURL, getStorage, listAll, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { fetchWithFeatures } from '../../../services/api';
 
 const storage = getStorage();
