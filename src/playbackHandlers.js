@@ -10,17 +10,7 @@ import { getCollection, setDocument } from './services/api/firestore';
 import { exportFiles } from './temp/export';
 
 const audio = new Audio();
-// const audio = new Video();
-// const audio = document.getElementById('video');
 console.log(audio);
-
-// setInterval(() => console.log(audio.audioTracks), 10 * 1000);
-
-const audioCtx = new AudioContext();
-const source = audioCtx.createMediaElementSource(audio);
-source.connect(audioCtx.destination);
-audioCtx.resume();
-console.log(source);
 
 audio.onended = () => choseNext(true);
 
