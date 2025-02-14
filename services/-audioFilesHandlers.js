@@ -1,7 +1,7 @@
-import setPause from "../helpers/setPause";
-import { getFileFromStorage } from "../src/services/api/storage";
-import { fetchBlob } from "./api";
-import { getStoredItem, storeItem } from "./localDbHandlers";
+import setPause from "../../helpers/setPause";
+import { getFileFromStorage } from "./api/storage";
+import { fetchBlob } from "../../services/api";
+import { getStoredItem, storeItem } from "../../services/localDbHandlers";
 
 const ratingInput = document.getElementById('rating');
 
@@ -41,6 +41,8 @@ export async function fetchAndStoreRemoteFile(filename) {
     queue.add(filename);
     reduceQueue();
 }
+
+// export async function()
 
 let improveRatingTries = 0;
 let searchTries = 0;

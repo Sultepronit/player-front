@@ -8,7 +8,7 @@ export function updatePlaylistView(playlist) {
     for (const info of playlist) {
         const originalFilename = info.originalFilename.replaceAll('/', ' | ');
         // newView += `<li>${info.id}. <sup>${info.rating}</sup> ${originalFilename}</li>`;
-        newView += `<li>
+        newView += `<li class="track" id="track-${info.id}">
             ${info.id}. ${originalFilename} <span class="li-rating">${info.rating}</span>
         </li>`;
     }

@@ -76,7 +76,7 @@ main {
     /* width: 400px; */
 }
 
-#playlist li {
+.track {
     background-color: #93ffcc;
     margin-block: 4px;
     border-radius: 3px;
@@ -91,6 +91,10 @@ main {
     color: blue;
     font-style: italic;
     font-size: 0.9em;
+}
+
+.selected-track {
+    background-color: #4ccb51;
 }
 
  #filename {

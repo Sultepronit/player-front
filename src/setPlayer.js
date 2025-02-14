@@ -1,4 +1,4 @@
-import { audio, choseNext, chosePrevious, updatePlayList } from "./playbackHandlers";
+import { audio, choseManually, choseNext, chosePrevious, updatePlayList } from "./playbackHandlers";
 import { saveTime } from "../services/timeSaver";
 import formateSeconds from "../helpers/formateSeconds";
 import { changeRating, changeVolume as changeTrackVolume } from "./currentMedia";
@@ -11,18 +11,9 @@ export default function setPlayer() {
     const trackVolumeControl = document.getElementById('track-volume');
 
     // progresss 
-    let lastTime = 0;
     audio.addEventListener('timeupdate', () => {
         const improvedDuration = audio.duration || 0; // can be NaN
-
-        // if (lastTime + 0.5 <= audio.currentTime) {
-        //     lastTime = audio.currentTime;
-
-        //     timeDisplay.innerText
-        //         = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
-
-        //     progressBar.value = audio.currentTime / audio.duration * 1000 || 0;
-        // }         
+  
         timeDisplay.innerText
             = `${formateSeconds(audio.currentTime)} / ${formateSeconds(improvedDuration)}`;
 
@@ -132,6 +123,22 @@ export default function setPlayer() {
             case 'KeyB':
                 chosePrevious();
                 break;
+        }
+    });
+
+    // global listener
+    let selectedTrackElement = null;
+    document.addEventListener('click', (e) => {
+        if (selectedTrackElement !== e.target) {
+            selectedTrackElement?.classList.remove('selected-track');
+
+            if (e.target?.id.startsWith('track-')) {
+                selectedTrackElement = e.target;
+                e.target.classList.add('selected-track');
+            }
+        } else {
+            const id = e.target.id.replace('track-', '');
+            choseManually(id);
         }
     });
 }

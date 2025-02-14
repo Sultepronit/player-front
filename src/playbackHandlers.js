@@ -1,5 +1,5 @@
 // import { fetchWithFeatures } from '../services/api';
-import { fetchAndStoreRemoteFile, getLocalFile, tryAndFindAvailable } from '../services/audioFilesHandlers';
+import { fetchAndStoreRemoteFile, getLocalFile, getManuallySellected, tryAndFindAvailable } from './services/audioFilesHandlers';
 import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "../services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
@@ -9,10 +9,18 @@ import { getCollection, setDocument } from './services/api/firestore';
 // import { uploadBlob } from './services/api/storage';
 import { exportFiles } from './temp/export';
 
-// const audio = new Audio();
+const audio = new Audio();
 // const audio = new Video();
-const audio = document.getElementById('video');
+// const audio = document.getElementById('video');
 console.log(audio);
+
+// setInterval(() => console.log(audio.audioTracks), 10 * 1000);
+
+const audioCtx = new AudioContext();
+const source = audioCtx.createMediaElementSource(audio);
+source.connect(audioCtx.destination);
+audioCtx.resume();
+console.log(source);
 
 audio.onended = () => choseNext(true);
 
@@ -146,6 +154,18 @@ function updateHistory(mediaIndex) {
     if (history.past.length > history.future.length) {
         history.future.push(history.past.shift());
     }
+}
+
+export async function choseManually(id) {
+    history.inPast = 0;
+     
+    const trackIndex = id - 1;
+    const trackInfo = playlist[trackIndex];
+    console.log('manually:', trackInfo);
+    const mediaFile = await getManuallySellected(trackInfo);
+
+    updateHistory(trackIndex);
+    setMedia({ mediaInfo: trackInfo, mediaFile }, true);
 }
 
 let isBusy = false;
