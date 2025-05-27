@@ -27,7 +27,16 @@ export default function setPlayer() {
     // buttons
     let isPlaying = false;
     function playManually() {
-        audio.play();
+        // audio.play();
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                addMessage('playing?');
+            })
+            .catch(error => {
+                addMessage(error.message);
+            });
+        }
         updatePlayList();
     }
 
