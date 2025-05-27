@@ -6,7 +6,7 @@ export function addMessage(message) {
     messagesDisplay.classList.remove('hidden');
 }
 
-addMessage('testing 4');
+// addMessage('testing 4');
 
 document.getElementById('hide-messages').addEventListener('click', () => {
     msgBoard.innerHTML = '';

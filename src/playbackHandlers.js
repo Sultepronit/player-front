@@ -124,9 +124,9 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
 
     try {
         if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
-        addMessage(mediaFile);
+        // addMessage(mediaFile);
         audio.src = URL.createObjectURL(mediaFile);   
-        addMessage(audio.src);
+        // addMessage(audio.src);
 
         // if (play) await audio.play();
         // if (play) audio.play();
