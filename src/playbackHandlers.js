@@ -126,13 +126,14 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
         if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
         audio.src = URL.createObjectURL(mediaFile);   
 
-        if (play) await audio.play();
+        // if (play) await audio.play();
+        if (play) audio.play();
 
         console.log(history);
         localStorage.setItem('history', JSON.stringify(history));
     } catch (error) { // no file is stored, or not a mediafile
         addMessage(error.message);
-        fetchAndStoreRemoteFile(mediaInfo.filename);
+        if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
     }
 }
 
