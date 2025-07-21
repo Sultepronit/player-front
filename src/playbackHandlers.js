@@ -10,7 +10,7 @@ import { getCollection, setDocument } from './services/api/firestore';
 import { exportFiles } from './temp/export';
 
 const audio = new Audio();
-console.log(audio);
+// console.log(audio);
 
 audio.onended = () => choseNext(true);
 
@@ -100,7 +100,8 @@ export async function startSession() {
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
-        const playlist = await getCollection('list-details');
+        // const playlist = await getCollection('list-details');
+        playlist = await getCollection('list-details');
         playlist.sort((a, b) => a.id - b.id);
 
         updatePlaylistView(playlist);

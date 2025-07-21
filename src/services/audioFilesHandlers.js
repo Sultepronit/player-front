@@ -65,6 +65,7 @@ export async function tryAndFindAvailable(playlist, futureList) {
     // trying to get random file
     let mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
     let mediaInfo = playlist[mediaIndex];
+    // console.log(playlist, mediaIndex, mediaInfo);
 
     console.log('improveRatingTries:', improveRatingTries);
     // sending a dummy if it does not meet the requirements: we'll be back soon

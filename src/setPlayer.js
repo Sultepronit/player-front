@@ -2,6 +2,7 @@ import { audio, choseManually, choseNext, chosePrevious, updatePlayList } from "
 import { saveTime } from "../services/timeSaver";
 import formateSeconds from "../helpers/formateSeconds";
 import { changeRating, changeVolume as changeTrackVolume } from "./currentMedia";
+import { addMessage } from "./handleMessages";
 
 export default function setPlayer() {
     // html elements
@@ -31,7 +32,7 @@ export default function setPlayer() {
         const playPromise = audio.play();
         if (playPromise !== undefined) {
             playPromise.then(_ => {
-                addMessage('playing?');
+                // addMessage('playing?');
             })
             .catch(error => {
                 addMessage(error.message);
