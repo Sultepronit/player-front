@@ -1,6 +1,6 @@
 // import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, getManuallySellected, tryAndFindAvailable } from './services/audioFilesHandlers';
-import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "./services/localDbHandlers";
+import { backupPlaylist, getStoredItem, restoreFilesList, resotrePlaylist as restorePlaylist, storeItem } from "./services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
@@ -20,6 +20,8 @@ let history = {
     future: [],
     inPast: 0,
 }
+
+let localFilesList = null;
 
 const ratingFilteredDisplay = document.getElementById('rating-filtered');
 const ratingInput = document.getElementById('rating');
@@ -78,12 +80,26 @@ function createHistrory() {
     choseNext(false);
 }
 
-const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
+async function initiateFilesList() {
+    try {
+        const filenames = await restoreFilesList();
+        // console.log(filenames);
+        localFilesList = filenames.map(n => n.split('.')[0]);
+        console.log(localFilesList);
+    } catch (error) {
+        addMessage(error.message);
+    }
+    
+}
+
+// const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
 export async function startSession() {
-    playlist = await resotrePlaylist();
+    initiateFilesList();
+
+    playlist = await restorePlaylist();
     playlist.sort((a, b) => a.id - b.id);
     console.log(playlist);
-    updatePlaylistView(playlist);
+    // updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist');
 
     if (playlist && playlist.length) {
@@ -101,19 +117,21 @@ export async function startSession() {
             createHistrory();
         }
 
-        if (!devNotUpdate) updatePlayList();
+        if (!import.meta.env.VITE_DEV_NOT_UPDATE) updatePlayList();
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
         playlist = await getCollection('list-details');
         playlist.sort((a, b) => a.id - b.id);
 
-        updatePlaylistView(playlist);
+        // updatePlaylistView(playlist);
 
         backupPlaylist(playlist);
 
         createHistrory();
     }
+
+    updatePlaylistView(playlist, localFilesList);
 
     console.timeLog('t', 'Starting playback...');
 

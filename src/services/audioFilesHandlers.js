@@ -1,9 +1,23 @@
 import setPause from "../../helpers/setPause";
 import { getFileFromStorage } from "./api/storage";
 import { fetchBlob } from "../../services/api";
-import { getStoredItem, storeItem } from "./localDbHandlers";
+import { getStoredItem, restoreFilesList, storeItem } from "./localDbHandlers";
+import { addMessage } from "../handleMessages";
 
 const ratingInput = document.getElementById('rating');
+// let localFilesList = null;
+
+// export async function initiateFilesList() {
+//     try {
+//         const filenames = await restoreFilesList();
+//         console.log(filenames);
+//         localFilesList = filenames.map(n => n.split('.')[0]);
+//         console.log(localFilesList);
+//     } catch (error) {
+//         addMessage(error.message);
+//     }
+    
+// }
 
 export async function getLocalFile(filename) {
     return await getStoredItem('files', filename, 'blob');

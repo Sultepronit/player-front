@@ -85,6 +85,11 @@ main {
     /* overflow: auto; */
     /* width: inherit; */
     /* height: 1.6em; */
+    color: gray;
+}
+
+.is-available {
+    color: black;
 }
 
 .li-rating {

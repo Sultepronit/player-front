@@ -42,6 +42,20 @@ export async function resotrePlaylist() {
     });
 }
 
+export async function restoreFilesList() {
+    const db = await dbPromise;
+    const tx = db.transaction('files');
+    const store = tx.objectStore('files');
+
+    const request = store.getAllKeys();
+    return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+// console.log(await restoreFileList());
+
 export async function getStoredItem(storeName, id, valueName) {
     const db = await dbPromise;
 
