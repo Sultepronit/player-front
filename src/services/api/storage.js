@@ -2,7 +2,7 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { fetchWithFeatures } from '../../../services/api';
 
 const storage = getStorage();
-console.log(storage);
+// console.log(storage);
 
 // export async function uploadBlob(filename, blob) {
 // export async function uploadBlob(blob, folderPath, filename) {

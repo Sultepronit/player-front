@@ -1,4 +1,4 @@
-import { getStoredItem } from "../../services/localDbHandlers";
+import { getStoredItem } from "../services/localDbHandlers";
 import { uploadToStorage } from "../services/api/storage";
 
 async function exportList() {

@@ -1,7 +1,7 @@
 import setPause from "../../helpers/setPause";
 import { getFileFromStorage } from "./api/storage";
 import { fetchBlob } from "../../services/api";
-import { getStoredItem, storeItem } from "../../services/localDbHandlers";
+import { getStoredItem, storeItem } from "./localDbHandlers";
 
 const ratingInput = document.getElementById('rating');
 

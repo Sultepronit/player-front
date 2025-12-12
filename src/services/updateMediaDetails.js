@@ -1,4 +1,4 @@
-import { storeItem } from "../../services/localDbHandlers";
+import { storeItem } from "./localDbHandlers";
 import { setDocument } from "./api/firestore";
 
 export default async function updateMediaDetails(details) {

@@ -1,6 +1,6 @@
 // import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, getManuallySellected, tryAndFindAvailable } from './services/audioFilesHandlers';
-import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "../services/localDbHandlers";
+import { backupPlaylist, getStoredItem, resotrePlaylist, storeItem } from "./services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
@@ -33,18 +33,13 @@ ratingInput.addEventListener('change', updateRatingDisplay);
 
 setInterval(() => saveTime(), 10 * 1000);
 
-function startFromScratch() {
-    history.future.push(...playlist.keys());
-    localStorage.setItem('history', JSON.stringify(history));
-    choseNext(false);
-}
-
 export async function updatePlayList() {
     // const newPlaylist = await fetchWithFeatures('/list');
     const remotePlaylist = await getCollection('list-details');
     remotePlaylist.sort((a, b) => a.id - b.id);
     console.log('remote playlist:', remotePlaylist);
 
+    // if there is new entries update the future
     if (remotePlaylist.length > playlist.length) {
         history.future = [...remotePlaylist.keys()]
             .filter((index) => !history.past.includes(index));
@@ -52,6 +47,7 @@ export async function updatePlayList() {
         localStorage.setItem('history', JSON.stringify(history));
     }
 
+    // check for entries changes
     const updates = remotePlaylist.filter((entry, index) => {
         for (const field of Object.keys(entry)) {
             if (!playlist[index]) return true;
@@ -63,15 +59,23 @@ export async function updatePlayList() {
 
     if (!updates.length) return;
 
+    // implement changes
     playlist = remotePlaylist;
-    // playlist.sort((a, b) => a.id - b.id);
     updatePlaylistView(playlist);
 
-    const currentMedia = getCurrentMedia();
-    setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
+    // what the heck are we doing here???
+    // const currentMedia = getCurrentMedia();
+    // console.log(currentMedia);
+    // setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
 
     backupPlaylist(updates);
     updateRatingDisplay();
+}
+
+function createHistrory() {
+    history.future.push(...playlist.keys());
+    localStorage.setItem('history', JSON.stringify(history));
+    choseNext(false);
 }
 
 const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
@@ -88,19 +92,19 @@ export async function startSession() {
         // const savedHistory = null;
         if (restoredHistory?.past.length) {
             history = restoredHistory;
-            history.inPast++;
 
+            history.inPast++;
             chosePrevious(false);
+
             restoreTime();
         } else {
-            startFromScratch();
+            createHistrory();
         }
 
         if (!devNotUpdate) updatePlayList();
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
-        // const playlist = await getCollection('list-details');
         playlist = await getCollection('list-details');
         playlist.sort((a, b) => a.id - b.id);
 
@@ -108,14 +112,12 @@ export async function startSession() {
 
         backupPlaylist(playlist);
 
-        startFromScratch();
+        createHistrory();
     }
 
     console.timeLog('t', 'Starting playback...');
 
     updateRatingDisplay();
-    // exportFiles(playlist);
-    // exportList();
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
