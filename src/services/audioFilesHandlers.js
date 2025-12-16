@@ -5,19 +5,6 @@ import { getStoredItem, restoreFilesList, storeItem } from "./localDbHandlers";
 import { addMessage } from "../handleMessages";
 
 const ratingInput = document.getElementById('rating');
-// let localFilesList = null;
-
-// export async function initiateFilesList() {
-//     try {
-//         const filenames = await restoreFilesList();
-//         console.log(filenames);
-//         localFilesList = filenames.map(n => n.split('.')[0]);
-//         console.log(localFilesList);
-//     } catch (error) {
-//         addMessage(error.message);
-//     }
-    
-// }
 
 export async function getLocalFile(filename) {
     return await getStoredItem('files', filename, 'blob');
@@ -25,35 +12,34 @@ export async function getLocalFile(filename) {
 
 // there can be caotic requests for differet or even one and the same file,
 // but we must fetch them one by one
-const queue = new Set();
-async function reduceQueue() {
-    console.log(queue);
-    const filename = [...queue][0];
+// const queue = new Set();
+// async function reduceQueue() {
+//     console.log(queue);
+//     const filename = [...queue][0];
 
+//     console.log('fetching:', filename);
+//     // const audioBlob = await getFileFromStorage(filename) || await fetchBlob(filename);
+//     const audioBlob = await getFileFromStorage(filename);
+
+//     await storeItem('files', { filename, blob: audioBlob });
+//     console.log('fetched:', filename, audioBlob);
+
+//     queue.delete(filename); 
+
+//     if (queue.size) reduceQueue();
+// }
+
+let isBusy = false;
+export async function fetchAndStoreRemoteFile(filename, addAnyway) { 
+    if (isBusy && !addAnyway) return;
+
+    isBusy = true;
     console.log('fetching:', filename);
-    // const audioBlob = await getFileFromStorage(filename) || await fetchBlob(filename);
     const audioBlob = await getFileFromStorage(filename);
 
     await storeItem('files', { filename, blob: audioBlob });
     console.log('fetched:', filename, audioBlob);
-
-    queue.delete(filename); 
-
-    if (queue.size) reduceQueue();
-}
-
-export function fetchAndStoreRemoteFile(filename, addAnyway) { 
-    console.log('next in queue:', filename);
-
-    if(queue.size >= 2 && !addAnyway) return;
-
-    if (queue.size) {
-        queue.add(filename);
-        return;
-    }
-
-    queue.add(filename);
-    reduceQueue();
+    isBusy = false;
 }
 
 export async function getManuallySellected(trackInfo) {
@@ -72,54 +58,40 @@ export async function getManuallySellected(trackInfo) {
     }
 }
 
-let improveRatingTries = 0;
-let searchTries = 0;
-const bestSoFar = { mediaInfo: { rating: 0 } };
-export async function tryAndFindAvailable(playlist, futureList) {
-    // trying to get random file
-    let mediaIndex = futureList[Math.floor(Math.random() * futureList.length)];
-    let mediaInfo = playlist[mediaIndex];
-    // console.log(playlist, mediaIndex, mediaInfo);
-
-    console.log('improveRatingTries:', improveRatingTries);
-    // sending a dummy if it does not meet the requirements: we'll be back soon
-    const randomNorm = (Math.random() * 100);
-    console.log('randomNorm:', randomNorm);
-    // if (mediaInfo.rating < ratingInput.value || mediaInfo.rating < (Math.random() * 100)) {
-    if (mediaInfo.rating < ratingInput.value || mediaInfo.rating < randomNorm) {
-        if (bestSoFar.mediaInfo.rating < mediaInfo.rating) {
-            bestSoFar.mediaIndex = mediaIndex;
-            bestSoFar.mediaInfo = mediaInfo;
-            console.log('best so far:', bestSoFar.mediaInfo);
-        }
-
-        if (improveRatingTries++ < 20) {
-            return { mediaIndex, pass: true };
-        } else {
-            mediaIndex = bestSoFar.mediaIndex;
-            mediaInfo = bestSoFar.mediaInfo;
-        }
+function findRandom(futureList, localFiles) {
+    let mediaIndex = 0;
+    for(let i = 0; i < 10; i++) {
+        mediaIndex = localFiles[Math.floor(Math.random() * localFiles.length)] - 1;
+        console.log(i, mediaIndex);
+        if (futureList.includes(mediaIndex)) break;
     }
-    improveRatingTries = 0;
+    return mediaIndex;
+}
 
-    // trying to get the local blob
+export async function findAvailable(playlist, futureList, localFiles) {
+    while (!localFiles.length) await setPause(500);
+    
+    let mediaIndex = 0;  
+    let mediaInfo = { rating: 0 };
+
+    for (let i = 0; i < 20; i++) {
+        const index = findRandom(futureList, localFiles)   
+        const info = playlist[index];
+        console.log(index, info);
+
+        const randomNorm = (Math.random() * 100);
+        console.log('randomNorm:', randomNorm);
+
+        if (mediaInfo.rating < info.rating) {
+            mediaIndex = index;
+            mediaInfo = info;
+        }
+
+        if (info.rating >= ratingInput.value && info.rating >= randomNorm) break;
+        console.log('tries:', i);
+        console.log('best so far:', mediaInfo);
+    }
+
     const mediaFile = await getLocalFile(mediaInfo.filename);
-    if(mediaFile) {
-        searchTries = 0;
-        return { mediaIndex, mediaInfo, mediaFile };
-    }
-
-    // fetching the unavailable file for more or less near future
-    fetchAndStoreRemoteFile(mediaInfo.filename);
-
-    // recursively trying to find available file
-    // if there is no result, we are giving it some time to fetch and returning a dummy
-    console.log('searchTries:', searchTries);
-    if (searchTries++ >= 50) {
-        searchTries = 0;
-        await setPause(500);
-        return { mediaIndex, pass: true };
-    }
-
-    return await tryAndFindAvailable(playlist, futureList);
+    return { mediaIndex, mediaInfo, mediaFile };
 }

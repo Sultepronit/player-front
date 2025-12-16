@@ -1,5 +1,5 @@
 // import { fetchWithFeatures } from '../services/api';
-import { fetchAndStoreRemoteFile, getLocalFile, getManuallySellected, tryAndFindAvailable } from './services/audioFilesHandlers';
+import { fetchAndStoreRemoteFile, getLocalFile, getManuallySellected, findAvailable } from './services/audioFilesHandlers';
 import { backupPlaylist, getStoredItem, restoreFilesList, resotrePlaylist as restorePlaylist, storeItem } from "./services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
@@ -18,22 +18,44 @@ let playlist = [];
 let history = {
     past: [],
     future: [],
+    actualPast: [],
+    availableFuture: [],
     inPast: 0,
 }
 
-let localFilesList = null;
+let localFiles = null;
+let wantedFiles = [];
 
 const ratingFilteredDisplay = document.getElementById('rating-filtered');
 const ratingInput = document.getElementById('rating');
 
-function updateRatingDisplay() {
-    const filtered = playlist.filter(entry => entry.rating >= ratingInput.value).length;
-    ratingFilteredDisplay.innerText = `${ratingInput.value}: ${filtered}`;
+function updateRatingList() {
+    const filtered = playlist.filter(entry => entry.rating >= ratingInput.value);
+    ratingFilteredDisplay.innerText = `${ratingInput.value}: ${filtered.length}`;
+    console.log(filtered);
+    if (localFiles.length === playlist.length) return;
+    wantedFiles = filtered.filter(e => !localFiles.includes(e.id))
+    // wantedFiles = localFiles.filter(e => filtered.includes(e.id));
+    console.log(wantedFiles);
 }
 
-ratingInput.addEventListener('change', updateRatingDisplay);
+ratingInput.addEventListener('change', updateRatingList);
 
 setInterval(() => saveTime(), 10 * 1000);
+
+async function getRemoteFile() {
+    if (!wantedFiles.length) return;
+    const index = Math.floor(Math.random() * wantedFiles.length);
+    const track = wantedFiles[index];
+    console.log(track);
+
+    await fetchAndStoreRemoteFile(track.filename);
+    wantedFiles.splice(index, 1);
+    localFiles.push(track.id);
+    console.log(wantedFiles, localFiles);
+
+    if (localFiles.length - history.past.length < 5) getRemoteFile();
+}
 
 export async function updatePlayList() {
     // const newPlaylist = await fetchWithFeatures('/list');
@@ -46,7 +68,7 @@ export async function updatePlayList() {
         history.future = [...remotePlaylist.keys()]
             .filter((index) => !history.past.includes(index));
         console.log(history);
-        localStorage.setItem('history', JSON.stringify(history));
+        localStorage.setItem('history2', JSON.stringify(history));
     }
 
     // check for entries changes
@@ -63,7 +85,8 @@ export async function updatePlayList() {
 
     // implement changes
     playlist = remotePlaylist;
-    updatePlaylistView(playlist);
+    // updatePlaylistView(playlist);
+    updatePlaylistView(playlist, localFiles);
 
     // what the heck are we doing here???
     // const currentMedia = getCurrentMedia();
@@ -71,12 +94,12 @@ export async function updatePlayList() {
     // setCurrentMedia(playlist.find(entry => entry.id === currentMedia.id));
 
     backupPlaylist(updates);
-    updateRatingDisplay();
+    updateRatingList();
 }
 
 function createHistrory() {
     history.future.push(...playlist.keys());
-    localStorage.setItem('history', JSON.stringify(history));
+    localStorage.setItem('history2', JSON.stringify(history));
     choseNext(false);
 }
 
@@ -84,8 +107,8 @@ async function initiateFilesList() {
     try {
         const filenames = await restoreFilesList();
         // console.log(filenames);
-        localFilesList = filenames.map(n => n.split('.')[0]);
-        console.log(localFilesList);
+        localFiles = filenames.map(n => n.split('.')[0]);
+        console.log(localFiles);
     } catch (error) {
         addMessage(error.message);
     }
@@ -103,7 +126,7 @@ export async function startSession() {
     console.timeLog('t', 'Restored playlist');
 
     if (playlist && playlist.length) {
-        const restoredHistory = JSON.parse(localStorage.getItem('history'));
+        const restoredHistory = JSON.parse(localStorage.getItem('history2'));
         console.log(restoredHistory);
         // const savedHistory = null;
         if (restoredHistory?.past.length) {
@@ -131,11 +154,11 @@ export async function startSession() {
         createHistrory();
     }
 
-    updatePlaylistView(playlist, localFilesList);
+    updatePlaylistView(playlist, localFiles);
 
     console.timeLog('t', 'Starting playback...');
 
-    updateRatingDisplay();
+    updateRatingList();
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
@@ -153,7 +176,7 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
         // if (play) audio.play();
 
         console.log(history);
-        localStorage.setItem('history', JSON.stringify(history));
+        localStorage.setItem('history2', JSON.stringify(history));
 
         if (play) await audio.play();
     } catch (error) { // no file is stored, or not a mediafile
@@ -161,7 +184,6 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
         if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
     }
 }
-
 
 function updateHistory(mediaIndex) {
     history.future = history.future.filter(index => index !== mediaIndex);
@@ -186,6 +208,8 @@ export async function choseManually(id) {
 
 let isBusy = false;
 export async function choseNext(play = true, ratingIsOk = false) {
+    getRemoteFile();
+
     if (history.inPast < 0) return playAgainNext();
 
     if (play && !ratingIsOk) {
@@ -198,7 +222,7 @@ export async function choseNext(play = true, ratingIsOk = false) {
     }
 
     isBusy = true;
-    const nextMedia = await tryAndFindAvailable(playlist, history.future);
+    const nextMedia = await findAvailable(playlist, history.future, localFiles);
     isBusy = false;
 
     updateHistory(nextMedia.mediaIndex);
