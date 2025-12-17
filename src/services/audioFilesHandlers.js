@@ -31,7 +31,10 @@ export async function getLocalFile(filename) {
 
 let isBusy = false;
 export async function fetchAndStoreRemoteFile(filename, addAnyway) { 
-    if (isBusy && !addAnyway) return;
+    if (isBusy && !addAnyway) {
+        await setPause(500);
+        return false;
+    }
 
     isBusy = true;
     console.log('fetching:', filename);
@@ -40,6 +43,7 @@ export async function fetchAndStoreRemoteFile(filename, addAnyway) {
     await storeItem('files', { filename, blob: audioBlob });
     console.log('fetched:', filename, audioBlob);
     isBusy = false;
+    return true;
 }
 
 export async function getManuallySellected(trackInfo) {
@@ -75,8 +79,8 @@ function findRandom(history, localFiles) {
 export async function findAvailable(playlist, history, localFiles) {
     while (!localFiles.length) await setPause(500);
     
-    let mediaIndex = 0;  
-    let mediaInfo = { rating: 0 };
+    let trackIndex = 0;  
+    let trackInfo = { rating: 0 };
 
     for (let i = 0; i < 20; i++) {
         const index = findRandom(history, localFiles)   
@@ -86,16 +90,17 @@ export async function findAvailable(playlist, history, localFiles) {
         const randomNorm = (Math.random() * 100);
         console.log('randomNorm:', randomNorm);
 
-        if (mediaInfo.rating < info.rating) {
-            mediaIndex = index;
-            mediaInfo = info;
+        if (trackInfo.rating < info.rating) {
+            trackIndex = index;
+            trackInfo = info;
         }
 
         if (info.rating >= ratingInput.value && info.rating >= randomNorm) break;
         console.log('tries:', i);
-        console.log('best so far:', mediaInfo);
+        console.log('best so far:', trackInfo);
     }
 
-    const mediaFile = await getLocalFile(mediaInfo.filename);
-    return { mediaIndex, mediaInfo, mediaFile };
+    // const mediaFile = await getLocalFile(mediaInfo.filename);
+    // return { mediaIndex, mediaInfo, mediaFile };
+    return trackInfo;
 }

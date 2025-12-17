@@ -14,6 +14,8 @@ const audio = new Audio();
 
 audio.onended = () => choseNext(true);
 
+setInterval(() => saveTime(), 10 * 1000);
+
 let playlist = [];
 // let history0 = {
 //     past: [],
@@ -42,25 +44,25 @@ function updateRatingList() {
     wantedFiles = filtered.filter(e => !localFiles.includes(e.id))
     console.log('wanted:', wantedFiles);
 
-    // getRemoteFile();
+    getRemoteFile();
 }
 
 ratingInput.addEventListener('change', updateRatingList);
 
-setInterval(() => saveTime(), 10 * 1000);
-
 async function getRemoteFile() {
     if (!wantedFiles.length) return;
     const index = Math.floor(Math.random() * wantedFiles.length);
-    const track = wantedFiles[index];
-    console.log(track);
+    const trackInfo = wantedFiles[index];
+    console.log(trackInfo);
 
-    await fetchAndStoreRemoteFile(track.filename);
-    wantedFiles.splice(index, 1);
-    localFiles.push(track.id);
-    console.log(wantedFiles, localFiles);
+    const success = await fetchAndStoreRemoteFile(trackInfo.filename);
+    if (success) {
+        wantedFiles.splice(index, 1);
+        localFiles.push(trackInfo.id);
+        console.log(wantedFiles, localFiles);
 
-    displayNewAvailable(track.id);
+        displayNewAvailable(trackInfo.id);
+    }
 
     if (localFiles.length < 5) getRemoteFile();
 }
@@ -126,7 +128,6 @@ async function initiateFilesList() {
     } catch (error) {
         addMessage(error.message);
     }
-    
 }
 
 export async function startSession() {
@@ -177,24 +178,6 @@ export async function startSession() {
     getRemoteFile();
 }
 
-async function setMedia({ mediaInfo, mediaFile }, play = true) {
-    console.log('setting:', mediaInfo, mediaFile );
-    // const { id, originalFilename } = mediaInfo;
-    setCurrentMedia(mediaInfo);
-
-    try {
-        // if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
-        // addMessage(mediaFile);
-        URL.revokeObjectURL(audio.src);
-        audio.src = URL.createObjectURL(mediaFile);   
-
-        if (play) await audio.play();
-    } catch (error) { // no file is stored, or not a mediafile
-        addMessage(error.message);
-        // if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
-    }
-}
-
 function updateHistory(mediaIndex) {
     const historyIndex = history3.set.findIndex(e => e === mediaIndex); // second time we are doing this!!!
     history3.set.splice(historyIndex, 1);
@@ -216,6 +199,28 @@ function updateHistory(mediaIndex) {
     // }
 }
 
+async function setTrack(info, play = true) {
+    // console.log('setting:', mediaInfo, mediaFile );
+    console.log('setting:', info);
+    
+    setCurrentMedia(info);
+
+    try {
+        const blob = await getLocalFile(info.filename);
+        // if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
+        // addMessage(mediaFile);
+        URL.revokeObjectURL(audio.src);
+        audio.src = URL.createObjectURL(blob);
+
+        if (play) await audio.play();
+
+        updateHistory(info.id - 1);
+    } catch (error) { // no file is stored, or not a mediafile
+        addMessage(error.message);
+        // if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
+    }
+}
+
 let isBusy = false;
 export async function choseNext(play = true, ratingIsOk = false) {
     getRemoteFile();
@@ -232,37 +237,39 @@ export async function choseNext(play = true, ratingIsOk = false) {
     }
 
     isBusy = true;
-    const nextMedia = await findAvailable(playlist, history3, localFiles);
+    const trackInfo = await findAvailable(playlist, history3, localFiles);
     // console.log(nextMedia);
     isBusy = false;
 
-    setMedia(nextMedia, play);
-    updateHistory(nextMedia.mediaIndex);
+    setTrack(trackInfo, play);
+    // updateHistory(track.id - 1);
 }
 
 export async function chosePrevious(play = true) {
     // if (history.past.length + history.inPast < 2) return;
     if (history3.at >= history3.recycle) return;
 
-    const mediaInfo = playlist[
+    const trackInfo = playlist[
         // history.past[--history.inPast + history.past.length - 1]
         history3.set[history3.set.length - ++history3.at]
     ];
     console.log(history3);
-    const mediaFile = await getLocalFile(mediaInfo.filename);
+    // const mediaFile = await getLocalFile(trackInfo.filename);
     // console.log(mediaFile);
 
-    setMedia({ mediaInfo, mediaFile }, play);
+    // setTrack({ mediaInfo: trackInfo, mediaFile }, play);
+    setTrack(trackInfo, play);
 }
 
 async function playAgainNext() {
-    const mediaInfo = playlist[
+    const trackInfo = playlist[
         // history0.past[++history0.inPast + history0.past.length - 1]
         history3.set[history3.set.length - --history3.at]
     ];
-    const mediaFile = await getLocalFile(mediaInfo.filename);
+    // const mediaFile = await getLocalFile(mediaInfo.filename);
 
-    setMedia({ mediaInfo, mediaFile });
+    // setTrack({ mediaInfo, mediaFile });
+    setTrack(trackInfo);
 }
 
 export async function choseManually(id) {
@@ -275,9 +282,10 @@ export async function choseManually(id) {
     // const mediaFile = await getManuallySellected(trackInfo);
     await getManuallySellected(trackInfo);
 
-    const mediaFile = await getLocalFile(trackInfo.filename);
-    setMedia({ mediaInfo: trackInfo, mediaFile }, true);
-    updateHistory(trackIndex);
+    // const mediaFile = await getLocalFile(trackInfo.filename);
+    // setTrack({ mediaInfo: trackInfo, mediaFile }, true);
+    // updateHistory(trackIndex);
+    setTrack(trackInfo, true);
 }
 
 export { audio };
