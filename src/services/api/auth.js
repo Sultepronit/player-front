@@ -1,5 +1,7 @@
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import app from "./app";
+
+import { startSession } from '../../playbackHandlers.js';
 
 const auth = getAuth();
 
@@ -12,6 +14,7 @@ onAuthStateChanged(auth, user => {
     } else {
         console.log('Sign in!');
         loginView.classList.remove('hidden');
+        startSession();
     }
 });
 
@@ -31,3 +34,5 @@ export async function signIn(email, password) {
         }
     }
 }
+
+// signOut(auth);

@@ -1,7 +1,7 @@
 import setPause from "../../helpers/setPause";
 import { getFileFromStorage } from "./api/storage";
 import { fetchBlob } from "../../services/api";
-import { getStoredItem, restoreFilesList, storeItem } from "./localDbHandlers";
+import { doesItemExist, getStoredItem, restoreFilesList, storeItem } from "./localDbHandlers";
 import { addMessage } from "../handleMessages";
 
 const ratingInput = document.getElementById('rating');
@@ -44,11 +44,13 @@ export async function fetchAndStoreRemoteFile(filename, addAnyway) {
 
 export async function getManuallySellected(trackInfo) {
     for(let i = 0; i < 100; i++) {
-        const mediaFile = await getLocalFile(trackInfo.filename);
+        // const mediaFile = await getLocalFile(trackInfo.filename);
+        const isAvailable = await doesItemExist('files', trackInfo.filename);
+        // console.log(isAvailable);
 
-        if (mediaFile) {
-            console.log(mediaFile);
-            return mediaFile;
+        if (isAvailable) {
+            // return mediaFile;
+            break;
         } else if (i < 1) {
             fetchAndStoreRemoteFile(trackInfo.filename, true);
         }

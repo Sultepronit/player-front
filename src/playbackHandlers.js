@@ -155,7 +155,6 @@ export async function startSession() {
         // createHistory();
 
         if (!import.meta.env.VITE_DEV_NOT_UPDATE) updatePlayList();
-        console.log(!import.meta.env.VITE_DEV_NOT_UPDATE)
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
@@ -267,15 +266,18 @@ async function playAgainNext() {
 }
 
 export async function choseManually(id) {
-    history0.inPast = 0;
+    // history0.inPast = 0;
+    history3.at = 1;
      
     const trackIndex = id - 1;
     const trackInfo = playlist[trackIndex];
     console.log('manually:', trackInfo);
-    const mediaFile = await getManuallySellected(trackInfo);
+    // const mediaFile = await getManuallySellected(trackInfo);
+    await getManuallySellected(trackInfo);
 
-    updateHistory(trackIndex);
+    const mediaFile = await getLocalFile(trackInfo.filename);
     setMedia({ mediaInfo: trackInfo, mediaFile }, true);
+    updateHistory(trackIndex);
 }
 
 export { audio };
