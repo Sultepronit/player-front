@@ -35,7 +35,7 @@ function displayMediaInfo(details) {
 }
 
 export function setCurrentMedia(details) { 
-    console.log(details);
+    // console.log(details);
     currentMediaDetails = details;
     displayMediaInfo(details);
 

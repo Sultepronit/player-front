@@ -30,7 +30,7 @@ export async function getCollectionSize(name = 'list-details') {
 export async function setDocument(collection, id, data) {
     try {
         const docRef = doc(db, collection, id);
-        // await setDoc(docRef, data); 
+        await setDoc(docRef, data); 
         console.log("Document written with ID:", docRef.id);
         return 'success';
     } catch (error) {

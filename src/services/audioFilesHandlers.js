@@ -58,24 +58,26 @@ export async function getManuallySellected(trackInfo) {
     }
 }
 
-function findRandom(futureList, localFiles) {
+function findRandom(history, localFiles) {
     let mediaIndex = 0;
     for(let i = 0; i < 10; i++) { // not always from future
         mediaIndex = localFiles[Math.floor(Math.random() * localFiles.length)] - 1;
         console.log(i, mediaIndex);
-        if (futureList.includes(mediaIndex)) break;
+        const historyIndex = history.set.findIndex(e => e === mediaIndex);
+        console.log(historyIndex, history.set.length - history.recycle);
+        if (historyIndex <= history.set.length - history.recycle) break;
     }
     return mediaIndex;
 }
 
-export async function findAvailable(playlist, futureList, localFiles) {
+export async function findAvailable(playlist, history, localFiles) {
     while (!localFiles.length) await setPause(500);
     
     let mediaIndex = 0;  
     let mediaInfo = { rating: 0 };
 
     for (let i = 0; i < 20; i++) {
-        const index = findRandom(futureList, localFiles)   
+        const index = findRandom(history, localFiles)   
         const info = playlist[index];
         console.log(index, info);
 

@@ -4,7 +4,7 @@ import { backupPlaylist, getStoredItem, restoreFilesList, resotrePlaylist as res
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, getCurrentMedia, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
-import { updatePlaylistView } from './playlistDisplay';
+import { updatePlaylistView, displayNewAvailable } from './playlistDisplay';
 import { getCollection, setDocument } from './services/api/firestore';
 // import { uploadBlob } from './services/api/storage';
 import { exportFiles } from './temp/export';
@@ -15,25 +15,32 @@ const audio = new Audio();
 audio.onended = () => choseNext(true);
 
 let playlist = [];
-let history = {
-    past: [],
-    future: [],
-    inPast: 0,
+// let history0 = {
+//     past: [],
+//     future: [],
+//     inPast: 0,
+// }
+let history3 = {
+    set: [],
+    at: 1,
+    recycle: 1
 }
 
 let localFiles = null;
 let wantedFiles = [];
+let ratedN = 0;
 
 const ratingFilteredDisplay = document.getElementById('rating-filtered');
 const ratingInput = document.getElementById('rating');
 
 function updateRatingList() {
     const filtered = playlist.filter(entry => entry.rating >= ratingInput.value);
-    ratingFilteredDisplay.innerText = `${ratingInput.value}: ${filtered.length}`;
-    console.log(filtered);
+    ratedN = filtered.length;
+    ratingFilteredDisplay.innerText = `${ratingInput.value}: ${ratedN}`;
+    console.log('filtered:', filtered);
     if (localFiles.length === playlist.length) return;
     wantedFiles = filtered.filter(e => !localFiles.includes(e.id))
-    console.log(wantedFiles);
+    console.log('wanted:', wantedFiles);
 
     // getRemoteFile();
 }
@@ -53,9 +60,9 @@ async function getRemoteFile() {
     localFiles.push(track.id);
     console.log(wantedFiles, localFiles);
 
-    // if (localFiles.length - history.past.length < 5) getRemoteFile();
+    displayNewAvailable(track.id);
+
     if (localFiles.length < 5) getRemoteFile();
-    // console.log(localFiles.length - history.past.length)
 }
 
 export async function updatePlayList() {
@@ -66,10 +73,15 @@ export async function updatePlayList() {
 
     // if there is new entries update the future
     if (remotePlaylist.length > playlist.length) {
-        history.future = [...remotePlaylist.keys()]
-            .filter((index) => !history.past.includes(index));
-        console.log(history);
-        localStorage.setItem('history', JSON.stringify(history));
+        const newEntries = [];
+        for (let i = playlist.length; i < remotePlaylist.length; i++) {
+            newEntries.push(i);
+        }
+        history3.set.unshift(...newEntries);
+        // history0.future = [...remotePlaylist.keys()]
+        //     .filter((index) => !history0.past.includes(index));
+        // console.log(history0);
+        localStorage.setItem('history3', JSON.stringify(history3));
     }
 
     // check for entries changes
@@ -98,9 +110,10 @@ export async function updatePlayList() {
     updateRatingList();
 }
 
-function createHistrory() {
-    history.future.push(...playlist.keys());
-    localStorage.setItem('history', JSON.stringify(history));
+function createHistory() {
+    // history.future.push(...playlist.keys());
+    history3.set.push(...playlist.keys());
+    localStorage.setItem('history3', JSON.stringify(history3));
     choseNext(false);
 }
 
@@ -116,32 +129,33 @@ async function initiateFilesList() {
     
 }
 
-// const devNotUpdate = import.meta.env.VITE_DEV_NOT_UPDATE;
 export async function startSession() {
     initiateFilesList();
 
     playlist = await restorePlaylist();
     playlist.sort((a, b) => a.id - b.id);
-    console.log(playlist);
+    // console.log(playlist);
     // updatePlaylistView(playlist);
     console.timeLog('t', 'Restored playlist');
 
     if (playlist && playlist.length) {
-        const restoredHistory = JSON.parse(localStorage.getItem('history'));
+        const restoredHistory = JSON.parse(localStorage.getItem('history3'));
         console.log(restoredHistory);
-        // const savedHistory = null;
-        if (restoredHistory?.past.length) {
-            history = restoredHistory;
+        if (restoredHistory?.at) {
+            history3 = restoredHistory;
 
-            history.inPast++;
+            // history.inPast++;
+            history3.at--;
             chosePrevious(false);
 
             restoreTime();
         } else {
-            createHistrory();
+            createHistory();
         }
+        // createHistory();
 
         if (!import.meta.env.VITE_DEV_NOT_UPDATE) updatePlayList();
+        console.log(!import.meta.env.VITE_DEV_NOT_UPDATE)
     } else {
         console.log('New start!');
         // playlist = await fetchWithFeatures('/list');
@@ -152,7 +166,7 @@ export async function startSession() {
 
         backupPlaylist(playlist);
 
-        createHistrory();
+        createHistory();
     }
 
     updatePlaylistView(playlist, localFiles);
@@ -170,53 +184,47 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
     setCurrentMedia(mediaInfo);
 
     try {
-        if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
+        // if (mediaFile?.type.includes('text')) throw new Error(`${mediaFile?.type} instead of mediafile!`);
         // addMessage(mediaFile);
+        URL.revokeObjectURL(audio.src);
         audio.src = URL.createObjectURL(mediaFile);   
-        // addMessage(audio.src);
-
-        // if (play) await audio.play();
-        // if (play) audio.play();
-
-        console.log(history);
-        localStorage.setItem('history', JSON.stringify(history));
 
         if (play) await audio.play();
     } catch (error) { // no file is stored, or not a mediafile
         addMessage(error.message);
-        if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
+        // if (mediaFile?.type.includes('text')) fetchAndStoreRemoteFile(mediaInfo.filename);
     }
 }
 
 function updateHistory(mediaIndex) {
-    history.future = history.future.filter(index => index !== mediaIndex);
-    history.past.push(mediaIndex);
+    const historyIndex = history3.set.findIndex(e => e === mediaIndex); // second time we are doing this!!!
+    history3.set.splice(historyIndex, 1);
+    history3.set.push(mediaIndex);
 
-    if (history.past.length > history.future.length) {
-        history.future.push(history.past.shift());
+    if (history3.recycle < ratedN / 2) {
+        history3.recycle++;
+    } else if (history3.recycle > ratedN / 2) {
+        history3.recycle = ratedN / 2;
     }
-}
 
-export async function choseManually(id) {
-    history.inPast = 0;
-     
-    const trackIndex = id - 1;
-    const trackInfo = playlist[trackIndex];
-    console.log('manually:', trackInfo);
-    const mediaFile = await getManuallySellected(trackInfo);
+    console.log(history3);
+    localStorage.setItem('history3', JSON.stringify(history3));
+    // history0.future = history0.future.filter(index => index !== mediaIndex);
+    // history0.past.push(mediaIndex);
 
-    updateHistory(trackIndex);
-    setMedia({ mediaInfo: trackInfo, mediaFile }, true);
+    // if (history0.past.length > history0.future.length) {
+    //     history0.future.push(history0.past.shift());
+    // }
 }
 
 let isBusy = false;
 export async function choseNext(play = true, ratingIsOk = false) {
     getRemoteFile();
 
-    if (history.inPast < 0) return playAgainNext();
+    if (history3.at > 1) return playAgainNext();
 
     if (play && !ratingIsOk) {
-        changeRating(audio.currentTime < 60 ? -4 : 1);
+        // changeRating(audio.currentTime < 60 ? -4 : 1);
     }
 
     if (isBusy) {
@@ -225,38 +233,49 @@ export async function choseNext(play = true, ratingIsOk = false) {
     }
 
     isBusy = true;
-    const nextMedia = await findAvailable(playlist, history.future, localFiles);
+    const nextMedia = await findAvailable(playlist, history3, localFiles);
+    // console.log(nextMedia);
     isBusy = false;
 
-    updateHistory(nextMedia.mediaIndex);
-
-    console.log(nextMedia);
-    if(nextMedia.pass) {
-        return choseNext(play, true);
-    }
-
     setMedia(nextMedia, play);
+    updateHistory(nextMedia.mediaIndex);
 }
 
 export async function chosePrevious(play = true) {
-    if (history.past.length + history.inPast < 2) return;
+    // if (history.past.length + history.inPast < 2) return;
+    if (history3.at >= history3.recycle) return;
 
     const mediaInfo = playlist[
-        history.past[--history.inPast + history.past.length - 1]
+        // history.past[--history.inPast + history.past.length - 1]
+        history3.set[history3.set.length - ++history3.at]
     ];
+    console.log(history3);
     const mediaFile = await getLocalFile(mediaInfo.filename);
-    console.log(mediaFile);
+    // console.log(mediaFile);
 
     setMedia({ mediaInfo, mediaFile }, play);
 }
 
 async function playAgainNext() {
     const mediaInfo = playlist[
-        history.past[++history.inPast + history.past.length - 1]
+        // history0.past[++history0.inPast + history0.past.length - 1]
+        history3.set[history3.set.length - --history3.at]
     ];
     const mediaFile = await getLocalFile(mediaInfo.filename);
 
     setMedia({ mediaInfo, mediaFile });
+}
+
+export async function choseManually(id) {
+    history0.inPast = 0;
+     
+    const trackIndex = id - 1;
+    const trackInfo = playlist[trackIndex];
+    console.log('manually:', trackInfo);
+    const mediaFile = await getManuallySellected(trackInfo);
+
+    updateHistory(trackIndex);
+    setMedia({ mediaInfo: trackInfo, mediaFile }, true);
 }
 
 export { audio };

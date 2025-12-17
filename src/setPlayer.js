@@ -38,7 +38,7 @@ export default function setPlayer() {
                 addMessage(error.message);
             });
         }
-        updatePlayList();
+        if (!import.meta.env.VITE_DEV_NOT_UPDATE) updatePlayList();
     }
 
     function playPause() {

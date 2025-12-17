@@ -17,3 +17,9 @@ export function updatePlaylistView(playlist, available) {
     }
     listDisplay.innerHTML = newView;
 }
+
+export function displayNewAvailable(id) {
+    const element = document.getElementById(`track-${id}`);
+    // console.log(element);
+    element.classList.add('is-available');
+}
