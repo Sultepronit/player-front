@@ -60,7 +60,7 @@ export async function getManuallySellected(trackInfo) {
 
 function findRandom(futureList, localFiles) {
     let mediaIndex = 0;
-    for(let i = 0; i < 10; i++) {
+    for(let i = 0; i < 10; i++) { // not always from future
         mediaIndex = localFiles[Math.floor(Math.random() * localFiles.length)] - 1;
         console.log(i, mediaIndex);
         if (futureList.includes(mediaIndex)) break;

@@ -18,8 +18,6 @@ let playlist = [];
 let history = {
     past: [],
     future: [],
-    actualPast: [],
-    availableFuture: [],
     inPast: 0,
 }
 
@@ -35,8 +33,9 @@ function updateRatingList() {
     console.log(filtered);
     if (localFiles.length === playlist.length) return;
     wantedFiles = filtered.filter(e => !localFiles.includes(e.id))
-    // wantedFiles = localFiles.filter(e => filtered.includes(e.id));
     console.log(wantedFiles);
+
+    // getRemoteFile();
 }
 
 ratingInput.addEventListener('change', updateRatingList);
@@ -54,7 +53,9 @@ async function getRemoteFile() {
     localFiles.push(track.id);
     console.log(wantedFiles, localFiles);
 
-    if (localFiles.length - history.past.length < 5) getRemoteFile();
+    // if (localFiles.length - history.past.length < 5) getRemoteFile();
+    if (localFiles.length < 5) getRemoteFile();
+    // console.log(localFiles.length - history.past.length)
 }
 
 export async function updatePlayList() {
@@ -68,7 +69,7 @@ export async function updatePlayList() {
         history.future = [...remotePlaylist.keys()]
             .filter((index) => !history.past.includes(index));
         console.log(history);
-        localStorage.setItem('history2', JSON.stringify(history));
+        localStorage.setItem('history', JSON.stringify(history));
     }
 
     // check for entries changes
@@ -99,7 +100,7 @@ export async function updatePlayList() {
 
 function createHistrory() {
     history.future.push(...playlist.keys());
-    localStorage.setItem('history2', JSON.stringify(history));
+    localStorage.setItem('history', JSON.stringify(history));
     choseNext(false);
 }
 
@@ -126,7 +127,7 @@ export async function startSession() {
     console.timeLog('t', 'Restored playlist');
 
     if (playlist && playlist.length) {
-        const restoredHistory = JSON.parse(localStorage.getItem('history2'));
+        const restoredHistory = JSON.parse(localStorage.getItem('history'));
         console.log(restoredHistory);
         // const savedHistory = null;
         if (restoredHistory?.past.length) {
@@ -159,6 +160,8 @@ export async function startSession() {
     console.timeLog('t', 'Starting playback...');
 
     updateRatingList();
+
+    getRemoteFile();
 }
 
 async function setMedia({ mediaInfo, mediaFile }, play = true) {
@@ -176,7 +179,7 @@ async function setMedia({ mediaInfo, mediaFile }, play = true) {
         // if (play) audio.play();
 
         console.log(history);
-        localStorage.setItem('history2', JSON.stringify(history));
+        localStorage.setItem('history', JSON.stringify(history));
 
         if (play) await audio.play();
     } catch (error) { // no file is stored, or not a mediafile
