@@ -14,7 +14,7 @@ onAuthStateChanged(auth, user => {
     } else {
         console.log('Sign in!');
         loginView.classList.remove('hidden');
-        startSession();
+        // startSession();
     }
 });
 
@@ -23,6 +23,7 @@ export async function signIn(email, password) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         // console.log(userCredential);
         console.log(userCredential.user);
+        startSession();
         return 'success';
     } catch (error) {
         if (error.message.includes('invalid-credential')) {

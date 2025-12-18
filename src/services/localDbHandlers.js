@@ -54,16 +54,16 @@ export async function restoreFilesList() {
     });
 }
 
-export async function doesItemExist(storeName, id) {
-    const db = await dbPromise;
-    const tx = db.transaction('files', 'readonly');
-    const store = tx.objectStore(storeName);
-    const req = store.getKey(id);
-    return new Promise((resolve, reject) => {
-        req.onsuccess = () => resolve(req.result !== undefined);
-        req.onerror = () => reject(req.error);
-    });
-}
+// export async function doesItemExist(storeName, id) {
+//     const db = await dbPromise;
+//     const tx = db.transaction('files', 'readonly');
+//     const store = tx.objectStore(storeName);
+//     const req = store.getKey(id);
+//     return new Promise((resolve, reject) => {
+//         req.onsuccess = () => resolve(req.result !== undefined);
+//         req.onerror = () => reject(req.error);
+//     });
+// }
 
 export async function getStoredItem(storeName, id, valueName) {
     const db = await dbPromise;
