@@ -212,6 +212,7 @@ async function setTrack(info, play = true) {
         updateHistory(info.id - 1);
     } catch (error) {
         addMessage(error.message);
+        const blob = await getLocalFile(info.filename);
         addMessage(blob);
     }
 }
