@@ -212,7 +212,7 @@ async function setTrack(info, play = true) {
         updateHistory(info.id - 1);
     } catch (error) {
         addMessage(error.message);
-        addMeaasge(blob);
+        addMessage(blob);
     }
 }
 
