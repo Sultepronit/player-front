@@ -28,11 +28,8 @@ export async function fetchWithFeatures(path, method = 'GET', parser = 'json', b
     } catch (error) {
         statusBar.className = 'failed';
 
-        console.error(error);
-        addMessage(error.message);
-
         if (error.message.includes('Failed to fetch')) {
-            return await retry(fetchWithFeatures, path, method, parser, body);
+            return await retry(fetchWithFeatures, path, method, parser, body, urlHead);
         } else {
             console.error(error);
             addMessage(error.message);
