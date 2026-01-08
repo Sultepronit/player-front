@@ -79,7 +79,8 @@ export async function getStoredItem(storeName, id, valueName) {
             if(request.result) {
                 resolve(request.result[valueName]);
             } else {
-                resolve(null);
+                // resolve(null);
+                reject('failed!');
             }
         };
 
