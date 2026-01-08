@@ -127,7 +127,7 @@ async function initiateFilesList() {
     try {
         const filenames = await restoreFilesList();
         // console.log(filenames);
-        addMessage(filenames.join(', '));
+        // addMessage(filenames.join(', '));
         localFiles = filenames.map(n => n.split('.')[0]);
         console.log(localFiles);
     } catch (error) {
@@ -206,11 +206,12 @@ async function setTrack(info, play = true) {
 
     try {
         // console.log(await deleteItem('files', '0.mp3'));
+        // getLocalFile('0.mp3');
         const blob = await getLocalFile(info.filename);
 
         if (!blob) {
             const re = await deleteItem('files', info.filename);
-            if (re === 'success!') addMessage(info.filename, 'is removed!');
+            if (re === 'success!') addMessage(info.filename + 'is removed!');
             throw new Error('Non existing file!');
         }
 

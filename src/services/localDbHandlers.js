@@ -32,11 +32,12 @@ function openLocalDb() {
 
 const dbPromise = openLocalDb();
 
-async function useDb(storeName, action, write = false, args) {
+async function useDb(storeName, action, write = false, ...args) {
     const mode = write ? 'readwrite' : 'readonly';
     const db = await dbPromise;
     const tx = db.transaction(storeName, mode);
     const store = tx.objectStore(storeName);
+    console.log(...args);
     return store[action](...args);
 }
 
@@ -87,7 +88,7 @@ export async function getStoredItem(storeName, id, valueName) {
         request.onsuccess = () => {
             // console.log('Get from local db!');
             if(request.result) {
-                addMessage(JSON.stringify(request.result));
+                // addMessage(JSON.stringify(request.result));
                 resolve(request.result[valueName]);
             } else {
                 // resolve(null);
@@ -143,7 +144,7 @@ export async function deleteItem(storeName, key) {
     const req = await useDb(storeName, 'delete', true, key);
 
     return new Promise((resolve, reject) => {
-        req.onsuccess = () => resolve('success!');
+        req.onsuccess = () => resolve('success!')
         req.onerror = () => reject(req.error);
     });
 }

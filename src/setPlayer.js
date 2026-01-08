@@ -84,7 +84,7 @@ export default function setPlayer() {
     // gainNode.connect(audioCtx.destination);
     // gainNode.gain.value = 4;
 
-    volumeControl.value = localStorage.getItem('volume') || 70;
+    volumeControl.value = localStorage.getItem('volume') || 40;
     // let volume = localStorage.getItem('volume') || 70;
 
     function setVolume() {
