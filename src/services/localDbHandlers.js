@@ -1,6 +1,8 @@
 // import setPause from "../helpers/setPause";
 // let db = null;
 
+import { addMessage } from "../handleMessages";
+
 function openLocalDb() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('audioDb', 6);
@@ -77,6 +79,7 @@ export async function getStoredItem(storeName, id, valueName) {
         request.onsuccess = () => {
             // console.log('Get from local db!');
             if(request.result) {
+                addMessage(JSON.stringify(request.result));
                 resolve(request.result[valueName]);
             } else {
                 // resolve(null);
