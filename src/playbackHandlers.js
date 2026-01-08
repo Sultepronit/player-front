@@ -126,7 +126,8 @@ function createHistory() {
 async function initiateFilesList() {
     try {
         const filenames = await restoreFilesList();
-        // console.log(filenames);
+        console.log(filenames);
+        addMessage(filenames.join(', '));
         localFiles = filenames.map(n => n.split('.')[0]);
         console.log(localFiles);
     } catch (error) {
