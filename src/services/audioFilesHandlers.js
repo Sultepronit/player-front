@@ -11,19 +11,19 @@ export async function getLocalFile(filename) {
 
 let isBusy = false;
 export async function fetchAndStoreRemoteFile(filename, fetchAnyway) { 
-    if (isBusy && !fetchAnyway) {
-        // await setPause(500);
-        return false;
-    }
+    // if (isBusy && !fetchAnyway) {
+    //     // await setPause(500);
+    //     return false;
+    // }
 
-    isBusy = true;
-    console.log('fetching:', filename);
-    const audioBlob = await getFileFromStorage(filename);
+    // isBusy = true;
+    // console.log('fetching:', filename);
+    // const audioBlob = await getFileFromStorage(filename);
 
-    await storeItem('files', { filename, blob: audioBlob });
-    console.log('fetched:', filename, audioBlob);
-    isBusy = false;
-    return true;
+    // await storeItem('files', { filename, blob: audioBlob });
+    // console.log('fetched:', filename, audioBlob);
+    // isBusy = false;
+    // return true;
 }
 
 function findRandom(history, localFiles) {

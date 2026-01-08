@@ -32,6 +32,14 @@ function openLocalDb() {
 
 const dbPromise = openLocalDb();
 
+async function useDb(storeName, action, write = false, args) {
+    const mode = write ? 'readwrite' : 'readonly';
+    const db = await dbPromise;
+    const tx = db.transaction(storeName, mode);
+    const store = tx.objectStore(storeName);
+    return store[action](...args);
+}
+
 export async function resotrePlaylist() {
     const db = await dbPromise;
     const transaction = db.transaction('playlist');
@@ -131,3 +139,13 @@ export async function storeItem(storeName, item) {
     });
 }
 
+export async function deleteItem(storeName, key) {
+    const req = await useDb(storeName, 'delete', true, key);
+
+    return new Promise((resolve, reject) => {
+        req.onsuccess = () => resolve('success!');
+        req.onerror = () => reject(req.error);
+    });
+}
+
+// console.log(await deleteItem('files', '0.mp3'));

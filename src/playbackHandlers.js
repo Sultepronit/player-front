@@ -1,6 +1,6 @@
 // import { fetchWithFeatures } from '../services/api';
 import { fetchAndStoreRemoteFile, getLocalFile, findAvailable } from './services/audioFilesHandlers';
-import { backupPlaylist, restoreFilesList, resotrePlaylist as restorePlaylist } from "./services/localDbHandlers";
+import { backupPlaylist, deleteItem, restoreFilesList, resotrePlaylist as restorePlaylist } from "./services/localDbHandlers";
 import { restoreTime, saveTime } from '../services/timeSaver';
 import { changeRating, setCurrentMedia } from './currentMedia';
 import { addMessage } from './handleMessages';
@@ -56,7 +56,7 @@ async function getRemoteFile(trackInfo = null, fetchAnyway = false) {
     } else {
         wantedIndex = Math.floor(Math.random() * wantedFiles.length);
         trackInfo = wantedFiles[wantedIndex];
-        console.log(trackInfo);
+        // console.log(trackInfo);
     }
 
     const success = await fetchAndStoreRemoteFile(trackInfo.filename, fetchAnyway);
@@ -126,8 +126,8 @@ function createHistory() {
 async function initiateFilesList() {
     try {
         const filenames = await restoreFilesList();
-        console.log(filenames);
-        addMessage(filenames.join(', '));
+        // console.log(filenames);
+        // addMessage(filenames.join(', '));
         localFiles = filenames.map(n => n.split('.')[0]);
         console.log(localFiles);
     } catch (error) {
@@ -150,11 +150,13 @@ export async function startSession() {
         if (restoredHistory?.at) {
             history3 = restoredHistory;
 
-            // history.inPast++;
-            history3.at--;
-            chosePrevious(false);
-
-            restoreTime();
+            if (history3.recycle > 0) {
+                history3.at--;
+                chosePrevious(false);
+                restoreTime();
+            } else {
+                choseNext(false);
+            }
         } else {
             createHistory();
         }
@@ -203,6 +205,7 @@ async function setTrack(info, play = true) {
     setCurrentMedia(info);
 
     try {
+        // console.log(await deleteItem('files', '0.mp3'));
         const blob = await getLocalFile(info.filename);
 
         URL.revokeObjectURL(audio.src);
@@ -210,11 +213,11 @@ async function setTrack(info, play = true) {
 
         if (play) await audio.play();
 
-        updateHistory(info.id - 1);
+        // updateHistory(info.id - 1);
     } catch (error) {
         addMessage(error.message);
-        const blob = await getLocalFile(info.filename);
-        addMessage(blob);
+        // const blob = await getLocalFile(info.filename);
+        // addMessage(blob);
     }
 }
 
@@ -238,9 +241,11 @@ export async function choseNext(play = true, ratingIsOk = false) {
     isBusy = false;
 
     setTrack(trackInfo, play);
+    updateHistory(trackInfo.id - 1);
 }
 
 export async function chosePrevious(play = true) {
+    console.log('here we go?');
     if (history3.at >= history3.recycle) return;
 
     const trackInfo = playlist[
@@ -249,6 +254,7 @@ export async function chosePrevious(play = true) {
     console.log(history3);
 
     setTrack(trackInfo, play);
+    saveHistory();
 }
 
 async function playAgainNext() {
@@ -257,6 +263,7 @@ async function playAgainNext() {
     ];
 
     setTrack(trackInfo);
+    saveHistory();
 }
 
 export async function choseManually(id) {
@@ -280,6 +287,7 @@ export async function choseManually(id) {
     }
 
     setTrack(trackInfo, true);
+    updateHistory(trackIndex);
 }
 
 export { audio };
