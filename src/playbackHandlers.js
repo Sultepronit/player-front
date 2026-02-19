@@ -205,8 +205,6 @@ async function setTrack(info, play = true) {
     setCurrentMedia(info);
 
     try {
-        // console.log(await deleteItem('files', '0.mp3'));
-        // getLocalFile('0.mp3');
         const blob = await getLocalFile(info.filename);
 
         if (!blob) {
@@ -219,12 +217,8 @@ async function setTrack(info, play = true) {
         audio.src = URL.createObjectURL(blob);
 
         if (play) await audio.play();
-
-        // updateHistory(info.id - 1);
     } catch (error) {
         addMessage(error.message);
-        // const blob = await getLocalFile(info.filename);
-        // addMessage(blob);
     }
 }
 
